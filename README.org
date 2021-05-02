@@ -1,0 +1,702 @@
+* FTS
+一个受[[https://github.com/valeriansaliou/sonic][Sonic]]启发的Web友好的自托管ad-hoc微服务,
+提供基于 HTTP 的搜索功能,
+带有基于token和名单的访问控制策略,
+支持JSON Schema.
+
+所有URL都采用了反射性的CORS, 不提供针对 =Origin= 的访问控制策略.
+
+** 特征
+通常语境下, 全文搜索引擎集成了数据库+分词器+倒排索引+查询语言.
+FTS重新思考了传统全文搜索引擎的功能, 将其简化为更具有自由性, 同时占用资源更低的版本.
+
+*** 索引编制
+FTS有意简化了数据库和分词器, 将调用数据库和分词的大多数职责交给客户端控制.
+如此设计是因为现实世界中数据库方案和分词方案种类繁多, 绑定特定的方案只会徒增耦合性.
+
+**** 仅存储token和标识符
+FTS是一个提供token到标识符的键值对数据库, 标识符是另一个数据库中的键.
+
+客户端通过搜索token得到标识符后, 需在另一个数据库中查找这些标识符并进一步处理以得到搜索结果.
+
+**** 手动分词
+FTS不提供分词功能, 它的底层分词机制根据实际使用的后端略有不同, 大多数后端只支持对英语进行分词.
+最好FTS视作没有分词功能, 由客户端进行分词并手动提交分词结果(token).
+
+***** 缺点
+****** 性能
+FTS现阶段在更新token词典时必须通过HTTP API手动刷新整个倒排索引,
+效率会比内置分词的全文搜索引擎慢得多.
+理论上可以用WebSocket降低通信成本, 但目前还没有计划实现.
+
+*** 搜索
+**** 极简的查询语言
+FTS提供的查询语言在功能层面相当简单, 只支持完全匹配token的查询, 更复杂的查询必须由客户端完成.
+
+例如逻辑运算(AND, OR, NOT), 可以转换成多次查询与求并集(OR), 求交集(AND), 求差集(NOT)运算的组合.
+
+***** 缺点
+- 无法实现前缀搜索.
+
+** Install
+*** 从源代码运行
+可以使用环境变量 =FTS_HOST= 和 =FTS_PORT= 决定服务器监听的地址和端口, 默认值为localhost和8080.
+
+#+BEGIN_SRC sh
+git clone https://github.com/BlackGlory/fts
+cd log
+yarn install
+yarn build
+yarn --silent start
+#+END_SRC
+
+*** Docker
+#+BEGIN_SRC sh
+docker run \
+  --detach \
+  --publish 8080:8080 \
+  blackglory/fts
+#+END_SRC
+
+**** 从源代码构建
+#+BEGIN_SRC sh
+git clone https://github.com/BlackGlory/fts
+cd fts
+yarn install
+yarn docker:build
+#+END_SRC
+
+**** Recipes
+***** 公开服务器
+****** docker-compose.yml
+#+BEGIN_SRC yaml
+version: '3.8'
+
+services:
+  fts:
+    image: 'blackglory/fts'
+    restart: always
+    volumes:
+      - 'fts-data:/data'
+    ports:
+      - '8080:8080'
+
+volumes:
+  fts-data:
+#+END_SRC
+
+***** 私人服务器
+****** docker-compose.yml
+#+BEGIN_SRC yaml
+version: '3.8'
+
+services:
+  fts:
+    image: 'blackglory/fts'
+    restart: always
+    environment:
+      - FTS_ADMIN_PASSWORD=password
+      - FTS_TOKEN_BASED_ACCESS_CONTROL=true
+      - FTS_WRITE_TOKEN_REQUIRED=true
+      - FTS_SEARCH_TOKEN_REQUIRED=true
+      - FTS_DELETE_TOKEN_REQUIRED=true
+    volumes:
+      - 'fts-data:/data'
+    ports:
+      - '8080:8080'
+
+volumes:
+  fts-data:
+#+END_SRC
+
+** API
+所有API中的namespace和id都需要满足此正则表达式: =^[a-zA-Z0-9\.\-_]{0,255}$=
+
+*** Public
+**** write
+=PUT /fts/<namespace>/objects/<id>=
+
+往特定namespace的指定对象中写入tokens:
+#+BEGIN_SRC typescript
+string[]
+#+END_SRC
+
+如果相应的id已经存在于对象, 则会执行替换.
+
+如果开启基于token的访问控制, 则可能需要在Querystring提供具有write权限的token:
+=PUT /fts/<namespace>/objects/<id>?token=<token>=
+
+***** Example
+****** curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --data '[]' \
+  "http://localhost:8080/fts/$namespace/objects/${id}"
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
+  method: 'POST'
+, headers: {
+    'Content-Type': 'application/json'
+  }
+, body: JSON.stringify([])
+})
+#+END_SRC
+
+**** search
+~POST /fts/<namespace>/objects?query=<keyword>~
+
+可以使用 =offset= 和 =limit= 限制返回的查询结果数量.
+按匹配的准确度排序.
+
+返回结果为JSON数组:
+#+BEGIN_SRC ts
+Array<{ id: string, rank: number }>
+#+END_SRC
+
+此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
+
+如果开启基于token的访问控制, 则可能需要在Querystring提供具有search权限的token:
+=/fts/<namespace>/objects?token=<token>=
+
+***** Example
+****** curl
+#+BEGIN_SRC sh
+curl "http://localhost:8080/fts/$namespace/objects?query=$keyword"
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/fts/${namespace}/objects?query=${keyword}`).then(res => res.json())
+#+END_SRC
+
+**** delete
+=DELETE /fts/<namespace>/objects/<id>=
+
+删除特定namespace中的对象.
+
+如果开启基于token的访问控制, 则可能需要在Querystring提供具有delete权限的token:
+=/fts/<namespace>/objects/<id>?token=<token>=
+
+***** Example
+****** curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  "http://localhost:8080/fts/$namespace/objects/$id"
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
+  method: 'DELETE'
+})
+#+END_SRC
+
+**** delete all objects
+=DELETE /fts/<namespace>/objects=
+
+删除namespace中的所有对象.
+
+**** get all namespaces
+=GET /fts=
+
+列出所有的namespace.
+输出JSON =Array<string>=.
+
+此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
+
+*****  Example
+****** curl
+#+BEGIN_SRC sh
+curl 'http://localhost:8080/fts'
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch('http://localhost:8080/fts').then(res => res.json())
+#+END_SRC
+
+*** Private
+**** 访问控制
+Fts提供两种访问控制策略, 可以一并使用.
+
+所有访问控制API都使用基于口令的Bearer Token Authentication.
+口令需通过环境变量 =FTS_ADMIN_PASSWORD= 进行设置.
+
+访问控制规则是通过[[https://www.sqlite.org/wal.html][WAL模式]]j的SQLite3持久化的, 开启访问控制后,
+服务器的吞吐量和响应速度会受到硬盘性能的影响.
+
+已经打开的连接不会受到新的访问控制规则的影响.
+
+***** 基于名单的访问控制
+通过设置环境变量 =FTS_LIST_BASED_ACCESS_CONTROL= 开启基于名单的访问控制:
+- =whitelist=
+  启用基于namespace白名单的访问控制, 只有在名单内的namespace允许被访问.
+- =blacklist=
+  启用基于namespace黑名单的访问控制, 只有在名单外的namespace允许被访问.
+
+****** 黑名单
+******* 获取黑名单
+=GET /admin/blacklist=
+
+获取位于黑名单中的所有namespacenamespace, 返回JSON表示的字符串数组 =string[]=.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/blacklist"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch('http://localhost:8080/admin/blacklist', {
+  headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+}).then(res => res.json())
+#+END_SRC
+
+******* 添加黑名单
+=PUT /admin/blacklist/<namespace>=
+
+将特定namespace加入黑名单.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/blacklist/$namespace"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/blacklist/${namespace}`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+******* 移除黑名单
+=DELETE /admin/blacklist/<namespace>=
+
+将特定namespace从黑名单中移除.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/blacklist/$namespace"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/blacklist/${namespace}`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 白名单
+******* 获取白名单
+=GET /admin/whitelist=
+
+获取位于黑名单中的所有namespacenamespace, 返回JSON表示的字符串数组 =string[]=.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIM_PASSWORD" \
+  "http://localhost:8080/admin/whitelist"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch('http://localhost:8080/admin/whitelist', {
+  headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+}).then(res => res.json())
+#+END_SRC
+
+******* 添加白名单
+=PUT /admin/whitelist/<namespace>=
+
+将特定namespace加入白名单.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/whitelist/$namespace"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/whitelist/${namespace}`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+******* 移除白名单
+=DELETE /admin/whitelist/<namespace>=
+
+将特定namespace从白名单中移除.
+
+******** Example
+********* curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/whitelist/$namespace"
+#+END_SRC
+
+********* fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/whitelist/${namespace}`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+***** 基于token的访问控制
+对token的要求: =^[a-zA-Z0-9\.\-_]{1,256}$=
+
+通过设置环境变量 =FTS_TOKEN_BASED_ACCESS_CONTROL=true= 开启基于token的访问控制.
+
+基于token的访问控制将根据消息队列的token access policy决定其访问规则.
+可通过环境变量 =FTS_WRITE_TOKEN_REQUIRED=, =FTS_SEARCH_TOKEN_REQUIRED=,
+=FTS_DELETE_TOKEN_REQUIRED= 设置相关默认值, 未设置情况下为 =false=.
+
+一个消息队列可以有多个token, 每个token可以单独设置write和search权限, 不同消息队列的token不共用.
+
+基于token的访问控制作出了以下假设
+- token的传输过程是安全的
+- token难以被猜测
+- token的意外泄露可以被迅速处理
+
+****** 获取所有具有token策略的namespace
+=GET /admin/fts-with-token-policies=
+
+获取所有具有token策略的namespace, 返回由JSON表示的字符串数组 =string[]=.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts-with-token-policies"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch('http://localhost:8080/admin/fts-with-token-policies')
+#+END_SRC
+
+****** 获取特定namespace的token策略
+=GET /admin/fts/<namespace>/token-policies=
+
+返回JSON:
+#+BEGIN_SRC ts
+{
+  writeTokenRequired: boolean | null
+  searchTokenRequired: boolean | null
+  deleteTokenRequired: boolean | null
+}
+#+END_SRC
+=null= 代表沿用相关默认值.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/token-policies"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fethc(`http://localhost:8080/admin/fts/${namespace}/token-policies`, {
+  headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+}).then(res => res.json())
+#+END_SRC
+
+****** 设置token策略
+=PUT /admin/fts/<namespace>/token-policies/write-token-required=
+=PUT /admin/fts/<namespace>/token-policies/search-token-required=
+=PUT /admin/fts/<namespace>/token-policies/delete-token-required=
+
+Payload必须是一个布尔值.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  --header "Content-Type: application/json" \
+  --data "$WRITE_TOKEN_REQUIRED" \
+  "http://localhost:8080/admin/fts/$namespace/token-policies/write-token-required"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/token-policies/write-token-required`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  , 'Content-Type': 'application/json'
+  }
+, body: JSON.stringify(writeTokenRequired)
+})
+#+END_SRC
+
+****** 移除token策略
+=DELETE /admin/fts/<namespace>/token-policies/write-token-required=
+=DELETE /admin/fts/<namespace>/token-policies/search-token-required=
+=DELETE /admin/fts/<namespace>/token-policies/delete-token-required=
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/token-policies/write-token-required"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/token-policies/write-token-required`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 获取所有具有token的namespace
+=GET /admin/fts-with-tokens=
+
+获取所有具有token的namespace, 返回由JSON表示的字符串数组 =string[]=.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts-with-tokens"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts-with-tokens`, {
+  headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+}).then(res => res.json())
+#+END_SRC
+
+****** 获取特定namespace的所有token信息
+=GET /admin/fts/<namespace>/tokens=
+
+获取特定namespace的所有token信息, 返回JSON表示的token信息数组
+=Array<{ token: string, write: boolean, search: boolean, delete: boolean }>=.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens`, {
+  headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+}).then(res => res.json())
+#+END_SRC
+
+****** 为特定namespace的token设置write权限
+=PUT /admin/fts/<namespace>/tokens/<token>/write=
+
+添加/更新token, 为token设置write权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/write"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/write`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 取消特定namespace的token的write权限
+=DELETE /admin/fts/<namespace>/tokens/<token>/write=
+
+取消token的search权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/write"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/write`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 为特定namespace的token设置search权限
+=PUT /admin/fts/<namespace>/tokens/<token>/search=
+
+添加/更新token, 为token设置search权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/search"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 取消特定namespace的token的search权限
+=DELETE /admin/fts/<namespace>/tokens/<token>/search=
+
+取消token的search权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/search"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 为特定namespace的token设置delete权限
+=PUT /admin/fts/<namespace>/tokens/<token>/delete=
+
+添加/更新token, 为token设置delete权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request PUT \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/delete"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/delete`, {
+  method: 'PUT'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+****** 取消特定namespace的token的delete权限
+=DELETE /admin/fts/<namespace>/tokens/<token>/delete=
+
+取消token的delete权限.
+
+******* Example
+******** curl
+#+BEGIN_SRC sh
+curl \
+  --request DELETE \
+  --header "Authorization: Bearer $ADMIN_PASSWORD" \
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/delete"
+#+END_SRC
+
+******** fetch
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/delete`, {
+  method: 'DELETE'
+, headers: {
+    'Authorization': `Bearer ${adminPassword}`
+  }
+})
+#+END_SRC
+
+** HTTP/2
+FTS支持HTTP/2, 以多路复用反向代理时的连接, 可通过设置环境变量 =FTS_HTTP2=true= 开启.
+
+此HTTP/2支持不提供从HTTP/1.1自动升级的功能, 亦不提供HTTPS.
+因此, 在本地curl里进行测试时, 需要开启 =--http2-prior-knowledge= 选项.
+
+** 限制Payload大小
+设置环境变量 =FTS_PAYLOAD_LIMIT= 可限制服务接受的单个请求的Payload字节数, 默认值为1048576(1MB).
+
+设置环境变量 =FTS_WRITE_PAYLOAD_LIMIT= 可限制write接受的单个请求的Payload字节数,
+默认值继承自 =FTS_PAYLOAD_LIMIT=.
