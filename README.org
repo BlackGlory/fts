@@ -15,13 +15,15 @@ FTS有意简化了数据库和分词器, 将调用数据库和分词的大多数
 如此设计是因为现实世界中数据库方案和分词方案种类繁多, 绑定特定的方案只会徒增耦合性.
 
 **** 仅存储token和标识符
-FTS是一个提供token到标识符的键值对数据库, 标识符是另一个数据库中的键.
+FTS是一个提供vector到标识符的键值对数据库, 标识符是另一个数据库中的键.
 
-客户端通过搜索token得到标识符后, 需在另一个数据库中查找这些标识符并进一步处理以得到搜索结果.
+客户端查询得到标识符后, 需在另一个数据库中查找这些标识符并进一步处理以得到搜索结果.
 
 **** 手动分词
-FTS不提供分词功能, 它的底层分词机制根据实际使用的后端略有不同, 大多数后端只支持对英语进行分词.
-最好FTS视作没有分词功能, 由客户端进行分词并手动提交分词结果(token).
+FTS本身不提供分词功能, 它的底层分词机制根据实际使用的后端略有不同,
+大多数后端只支持对英语进行分词或只支持常见的停用词(stopword).
+
+使用FTS时, 建议将其视作没有任何分词功能, 由客户端进行分词并手动提交有序的词素(lexeme)数组.
 
 ***** 缺点
 ****** 性能
@@ -30,13 +32,81 @@ FTS现阶段在更新token词典时必须通过HTTP API手动刷新整个倒排�
 理论上可以用WebSocket降低通信成本, 但目前还没有计划实现.
 
 *** 搜索
-**** 极简的查询语言
-FTS提供的查询语言在功能层面相当简单, 只支持完全匹配token的查询, 更复杂的查询必须由客户端完成.
+**** 查询语言
+FTS提供的查询语言是一种AST结构的JSON数组.
 
-例如逻辑运算(AND, OR, NOT), 可以转换成多次查询与求并集(OR), 求交集(AND), 求差集(NOT)运算的组合.
+该项目曾经被设计为只支持查询单词和短语, 逻辑运算必须由客户端手动完成,
+考虑到通信延迟和查询优化方面的现实问题, 最终改成了AST的形式.
 
-***** 缺点
-- 无法实现前缀搜索.
+#+BEGIN_EXAMPLE javascript
+['a', AND, ['b', OR, [NOT, 'c']]]
+// 相当于 'a' AND ('b' OR (NOT 'c'))
+#+END_EXAMPLE
+
+***** AND = 0
+逻辑与, 左值和右值可以嵌套其他表达式.
+
+JavaScript:
+#+BEGIN_EXAMPLE js
+['left', AND, 'right']
+#+END_EXAMPLE
+
+JSON:
+#+BEGIN_EXAMPLE json
+["left", 0, "right"]
+#+END_EXAMPLE
+
+***** OR = 1
+逻辑或, 左值和右值可以嵌套其他表达式.
+
+JavaScript:
+#+BEGIN_EXAMPLE js
+['left', OR, 'right']
+#+END_EXAMPLE
+
+JSON:
+#+BEGIN_EXAMPLE json
+["left", 1, "right"]
+#+END_EXAMPLE
+
+***** NOT = 2
+逻辑非, 右值可以嵌套其他表达式.
+
+JavaScript:
+#+BEGIN_EXAMPLE js
+[NOT, 'right']
+#+END_EXAMPLE
+
+JSON:
+#+BEGIN_EXAMPLE json
+[2, "right"]
+#+END_EXAMPLE
+
+***** PHRASE = 3
+由连续单词组成的短语.
+
+JavaScript:
+#+BEGIN_EXAMPLE js
+[PHRASE, 'a', 'b', 'c']
+#+END_EXAMPLE
+
+JSON:
+#+BEGIN_EXAMPLE json
+[3, "a", "b", "c"]
+#+END_EXAMPLE
+
+***** PREFIX = 4
+由单个词素构成的前缀搜索.
+
+JavaScript:
+#+BEGIN_EXAMPLE js
+[PREFIX, 'a']
+#+END_EXAMPLE
+
+JSON:
+#+BEGIN_EXAMPLE json
+[4, "a"]
+#+END_EXAMPLE
 
 ** Install
 *** 从源代码运行
@@ -98,7 +168,7 @@ services:
       - FTS_ADMIN_PASSWORD=password
       - FTS_TOKEN_BASED_ACCESS_CONTROL=true
       - FTS_WRITE_TOKEN_REQUIRED=true
-      - FTS_SEARCH_TOKEN_REQUIRED=true
+      - FTS_QUERY_TOKEN_REQUIRED=true
       - FTS_DELETE_TOKEN_REQUIRED=true
     volumes:
       - 'fts-data:/data'
@@ -113,15 +183,18 @@ volumes:
 所有API中的namespace和id都需要满足此正则表达式: =^[a-zA-Z0-9\.\-_]{0,255}$=
 
 *** Public
-**** write
+**** set
 =PUT /fts/<namespace>/objects/<id>=
 
-往特定namespace的指定对象中写入tokens:
+往特定namespace的指定对象中写入lexemes:
 #+BEGIN_SRC typescript
 string[]
 #+END_SRC
 
 如果相应的id已经存在于对象, 则会执行替换.
+
+需要注意的是, lexemes在语义上是大小写敏感的, 一些后端可能会区分查询里的大小写.
+为了确保查询不受后端差异性的影响, 应该总是进行预处理, 将lexemes和查询都转换为统一的大写或小写形式.
 
 如果开启基于token的访问控制, 则可能需要在Querystring提供具有write权限的token:
 =PUT /fts/<namespace>/objects/<id>?token=<token>=
@@ -147,10 +220,10 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 })
 #+END_SRC
 
-**** search
-~POST /fts/<namespace>/objects?query=<keyword>~
+**** query
+~POST /fts/<namespace>/query~
 
-可以使用 =offset= 和 =limit= 限制返回的查询结果数量.
+使用 =offset= 和 =limit= 限制返回的查询结果数量.
 按匹配的准确度排序.
 
 返回结果为JSON数组:
@@ -160,18 +233,21 @@ Array<{ id: string, rank: number }>
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
-如果开启基于token的访问控制, 则可能需要在Querystring提供具有search权限的token:
+如果开启基于token的访问控制, 则可能需要在Querystring提供具有query权限的token:
 =/fts/<namespace>/objects?token=<token>=
 
 ***** Example
 ****** curl
 #+BEGIN_SRC sh
-curl "http://localhost:8080/fts/$namespace/objects?query=$keyword"
+curl \
+  --header 'Content-Type: application/json' \
+  --data '"expression"' \
+  "http://localhost:8080/fts/$namespace/query"
 #+END_SRC
 
 ****** JavaScript
 #+BEGIN_SRC js
-await fetch(`http://localhost:8080/fts/${namespace}/objects?query=${keyword}`).then(res => res.json())
+await fetch(`http://localhost:8080/fts/${namespace}/query`, {  }).then(res => res.json())
 #+END_SRC
 
 **** delete
@@ -197,7 +273,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 })
 #+END_SRC
 
-**** delete all objects
+**** clear
 =DELETE /fts/<namespace>/objects=
 
 删除namespace中的所有对象.
@@ -388,10 +464,10 @@ await fetch(`http://localhost:8080/admin/whitelist/${namespace}`, {
 通过设置环境变量 =FTS_TOKEN_BASED_ACCESS_CONTROL=true= 开启基于token的访问控制.
 
 基于token的访问控制将根据消息队列的token access policy决定其访问规则.
-可通过环境变量 =FTS_WRITE_TOKEN_REQUIRED=, =FTS_SEARCH_TOKEN_REQUIRED=,
+可通过环境变量 =FTS_WRITE_TOKEN_REQUIRED=, =FTS_QUERY_TOKEN_REQUIRED=,
 =FTS_DELETE_TOKEN_REQUIRED= 设置相关默认值, 未设置情况下为 =false=.
 
-一个消息队列可以有多个token, 每个token可以单独设置write和search权限, 不同消息队列的token不共用.
+一个消息队列可以有多个token, 每个token可以单独设置write和query权限, 不同消息队列的token不共用.
 
 基于token的访问控制作出了以下假设
 - token的传输过程是安全的
@@ -423,7 +499,7 @@ await fetch('http://localhost:8080/admin/fts-with-token-policies')
 #+BEGIN_SRC ts
 {
   writeTokenRequired: boolean | null
-  searchTokenRequired: boolean | null
+  queryTokenRequired: boolean | null
   deleteTokenRequired: boolean | null
 }
 #+END_SRC
@@ -448,7 +524,7 @@ await fethc(`http://localhost:8080/admin/fts/${namespace}/token-policies`, {
 
 ****** 设置token策略
 =PUT /admin/fts/<namespace>/token-policies/write-token-required=
-=PUT /admin/fts/<namespace>/token-policies/search-token-required=
+=PUT /admin/fts/<namespace>/token-policies/query-token-required=
 =PUT /admin/fts/<namespace>/token-policies/delete-token-required=
 
 Payload必须是一个布尔值.
@@ -478,7 +554,7 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/token-policies/write-t
 
 ****** 移除token策略
 =DELETE /admin/fts/<namespace>/token-policies/write-token-required=
-=DELETE /admin/fts/<namespace>/token-policies/search-token-required=
+=DELETE /admin/fts/<namespace>/token-policies/query-token-required=
 =DELETE /admin/fts/<namespace>/token-policies/delete-token-required=
 
 ******* Example
@@ -526,7 +602,7 @@ await fetch(`http://localhost:8080/admin/fts-with-tokens`, {
 =GET /admin/fts/<namespace>/tokens=
 
 获取特定namespace的所有token信息, 返回JSON表示的token信息数组
-=Array<{ token: string, write: boolean, search: boolean, delete: boolean }>=.
+=Array<{ token: string, write: boolean, query: boolean, delete: boolean }>=.
 
 ******* Example
 ******** curl
@@ -572,7 +648,7 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/write`
 ****** 取消特定namespace的token的write权限
 =DELETE /admin/fts/<namespace>/tokens/<token>/write=
 
-取消token的search权限.
+取消token的query权限.
 
 ******* Example
 ******** curl
@@ -593,10 +669,10 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/write`
 })
 #+END_SRC
 
-****** 为特定namespace的token设置search权限
-=PUT /admin/fts/<namespace>/tokens/<token>/search=
+****** 为特定namespace的token设置query权限
+=PUT /admin/fts/<namespace>/tokens/<token>/query=
 
-添加/更新token, 为token设置search权限.
+添加/更新token, 为token设置query权限.
 
 ******* Example
 ******** curl
@@ -604,12 +680,12 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/write`
 curl \
   --request PUT \
   --header "Authorization: Bearer $ADMIN_PASSWORD" \
-  "http://localhost:8080/admin/fts/$namespace/tokens/$token/search"
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/query"
 #+END_SRC
 
 ******** fetch
 #+BEGIN_SRC js
-await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search`, {
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/query`, {
   method: 'PUT'
 , headers: {
     'Authorization': `Bearer ${adminPassword}`
@@ -617,10 +693,10 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search
 })
 #+END_SRC
 
-****** 取消特定namespace的token的search权限
-=DELETE /admin/fts/<namespace>/tokens/<token>/search=
+****** 取消特定namespace的token的query权限
+=DELETE /admin/fts/<namespace>/tokens/<token>/query=
 
-取消token的search权限.
+取消token的query权限.
 
 ******* Example
 ******** curl
@@ -628,12 +704,12 @@ await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search
 curl \
   --request DELETE \
   --header "Authorization: Bearer $ADMIN_PASSWORD" \
-  "http://localhost:8080/admin/fts/$namespace/tokens/$token/search"
+  "http://localhost:8080/admin/fts/$namespace/tokens/$token/query"
 #+END_SRC
 
 ******** fetch
 #+BEGIN_SRC js
-await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/search`, {
+await fetch(`http://localhost:8080/admin/fts/${namespace}/tokens/${token}/query`, {
   method: 'DELETE'
 , headers: {
     'Authorization': `Bearer ${adminPassword}`
