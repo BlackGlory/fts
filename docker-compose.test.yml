@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  test:
+    build:
+      context: .
+      args:
+        - 'HTTP_PROXY'
+        - 'HTTPS_PROXY'
+    depends_on:
+      - postgres
+    command: 'test'
+    environment:
+      - 'FTS_POSTGRES_HOST=postgres'
+      - 'FTS_POSTGRES_PORT=5432'
+      - 'FTS_POSTGRES_USERNAME=postgres'
+      - 'FTS_POSTGRES_PASSWORD=password'
+      - 'FTS_POSTGRES_NAME=test'
+
+  coverage:
+    build:
+      context: .
+      args:
+        - 'HTTP_PROXY'
+        - 'HTTPS_PROXY'
+    depends_on:
+      - postgres
+    command: 'test:coverage'
+    environment:
+      - 'FTS_POSTGRES_HOST=postgres'
+      - 'FTS_POSTGRES_PORT=5432'
+      - 'FTS_POSTGRES_USERNAME=postgres'
+      - 'FTS_POSTGRES_PASSWORD=password'
+      - 'FTS_POSTGRES_NAME=test'
+
+  postgres:
+    image: 'postgres:13'
+    environment:
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_INITDB_ARGS=--locale=C.UTF-8'
