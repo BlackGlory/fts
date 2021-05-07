@@ -6,7 +6,7 @@
 
 所有URL都采用了反射性的CORS, 不提供针对 =Origin= 的访问控制策略.
 
-** 特征
+** 特性
 通常语境下, 全文搜索引擎集成了数据库+分词器+倒排索引+查询语言.
 FTS重新思考了传统全文搜索引擎的功能, 将其简化为更具有自由性, 同时占用资源更低的版本.
 
@@ -109,6 +109,16 @@ JSON:
 #+END_EXAMPLE
 
 ** Install
+*** 配置
+环境变量 =FTS_HOST= 和 =FTS_PORT= 决定服务器监听的地址和端口, 默认值为localhost和8080.
+
+以下环境变量用于设置PostgreSQL连接信息:
+- =FTS_POSTGRES_HOST= 主机名
+- =FTS_POSTGRES_PORT= 端口, 默认为5432
+- =FTS_POSTGRES_USERNAME= 用户名
+- =FTS_POSTGRES_PASSWORD= 密码
+- =FTS_POSTGRES_NAME= 数据库
+
 *** 从源代码运行
 可以使用环境变量 =FTS_HOST= 和 =FTS_PORT= 决定服务器监听的地址和端口, 默认值为localhost和8080.
 
@@ -146,13 +156,29 @@ services:
   fts:
     image: 'blackglory/fts'
     restart: always
+    depends_on:
+      - postgres
+    environment:
+      - 'FTS_POSTGRES_HOST=postgres'
+      - 'FTS_POSTGRES_PORT=5432'
+      - 'FTS_POSTGRES_USERNAME=postgres'
+      - 'FTS_POSTGRES_PASSWORD=password'
+      - 'FTS_POSTGRES_NAME=fts'
     volumes:
       - 'fts-data:/data'
     ports:
       - '8080:8080'
 
+  postgres:
+    image: 'postgres:13'
+    environment:
+      - 'POSTGRES_PASSWORD=password'
+    volumes:
+      - 'postgres-data:/var/lib/postgresql/data'
+
 volumes:
   fts-data:
+  postgres-data:
 #+END_SRC
 
 ***** 私人服务器
@@ -164,19 +190,34 @@ services:
   fts:
     image: 'blackglory/fts'
     restart: always
+    depends_on:
+      - postgres
     environment:
-      - FTS_ADMIN_PASSWORD=password
-      - FTS_TOKEN_BASED_ACCESS_CONTROL=true
-      - FTS_WRITE_TOKEN_REQUIRED=true
-      - FTS_QUERY_TOKEN_REQUIRED=true
-      - FTS_DELETE_TOKEN_REQUIRED=true
+      - 'FTS_POSTGRES_HOST=postgres'
+      - 'FTS_POSTGRES_PORT=5432'
+      - 'FTS_POSTGRES_USERNAME=postgres'
+      - 'FTS_POSTGRES_PASSWORD=password'
+      - 'FTS_POSTGRES_NAME=fts'
+      - 'FTS_ADMIN_PASSWORD=password'
+      - 'FTS_TOKEN_BASED_ACCESS_CONTROL=true'
+      - 'FTS_WRITE_TOKEN_REQUIRED=true'
+      - 'FTS_QUERY_TOKEN_REQUIRED=true'
+      - 'FTS_DELETE_TOKEN_REQUIRED=true'
     volumes:
       - 'fts-data:/data'
     ports:
       - '8080:8080'
 
+  postgres:
+    image: 'postgres:13'
+    environment:
+      - 'POSTGRES_PASSWORD=password'
+    volumes:
+      - 'postgres-data:/var/lib/postgresql/data'
+
 volumes:
   fts-data:
+  postgres:
 #+END_SRC
 
 ** API
@@ -223,13 +264,9 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 **** query
 ~POST /fts/<namespace>/query~
 
-使用 =offset= 和 =limit= 限制返回的查询结果数量.
-按匹配的准确度排序.
+通过表达式查询对象的id, 返回结果为JSON数组 =string[]=.
 
-返回结果为JSON数组:
-#+BEGIN_SRC ts
-Array<{ id: string, rank: number }>
-#+END_SRC
+可以用querystring =offset= 和 =limit= 限制返回的查询结果数量.
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
