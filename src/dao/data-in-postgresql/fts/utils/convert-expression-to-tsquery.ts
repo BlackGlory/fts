@@ -3,7 +3,7 @@ import { QueryKeyword } from '@src/query-keyword'
 import { SortedValueCollector } from './sorted-value-collector'
 
 export function convertExpressionToTsquery(
-  exp: QueryExpression
+  exp: IQueryExpression
 , collector: SortedValueCollector
 , options: { prefix?: string; postfix?: string } = {}
 ): string {
@@ -19,7 +19,7 @@ export function convertExpressionToTsquery(
   }
 
   if (isPhraseExpression(exp)) {
-    const result = (exp.slice(1) as QueryExpression[])
+    const result = (exp.slice(1) as IQueryExpression[])
       .map(x => convertExpressionToTsquery(x, collector, options))
       .join(' <-> ')
 
@@ -57,7 +57,7 @@ export function convertExpressionToTsquery(
   throw new Error('Illegal expression')
 }
 
-function isExpression(exp: unknown): exp is QueryExpression {
+function isExpression(exp: unknown): exp is IQueryExpression {
   return isWordExpression(exp)
       || isPhraseExpression(exp)
       || isPrefixExpression(exp)
@@ -66,25 +66,25 @@ function isExpression(exp: unknown): exp is QueryExpression {
       || isNotExpression(exp)
 }
 
-function isWordExpression(exp: unknown): exp is WordExpression {
+function isWordExpression(exp: unknown): exp is IWordExpression {
   return isString(exp)
 }
 
-function isPhraseExpression(exp: unknown): exp is PhraseExpression {
+function isPhraseExpression(exp: unknown): exp is IPhraseExpression {
   return Array.isArray(exp)
       && exp.length >= 3
       && exp[0] === QueryKeyword.Phrase
       && exp.slice(1).every(isExpression)
 }
 
-function isPrefixExpression(exp: unknown): exp is PrefixExpression {
+function isPrefixExpression(exp: unknown): exp is IPrefixExpression {
   return Array.isArray(exp)
       && exp.length === 2
       && exp[0] === QueryKeyword.Prefix
       && isString(exp[1])
 }
 
-function isAndExpression(exp: unknown): exp is AndExpression {
+function isAndExpression(exp: unknown): exp is IAndExpression {
   return Array.isArray(exp)
       && exp.length === 3
       && exp[1] === QueryKeyword.And
@@ -92,7 +92,7 @@ function isAndExpression(exp: unknown): exp is AndExpression {
       && isExpression(exp[2])
 }
 
-function isOrExpression(exp: unknown): exp is OrExpression {
+function isOrExpression(exp: unknown): exp is IOrExpression {
   return Array.isArray(exp)
       && exp.length === 3
       && exp[1] === QueryKeyword.Or
@@ -100,7 +100,7 @@ function isOrExpression(exp: unknown): exp is OrExpression {
       && isExpression(exp[2])
 }
 
-function isNotExpression(exp: unknown): exp is NotExpression {
+function isNotExpression(exp: unknown): exp is INotExpression {
   return Array.isArray(exp)
       && exp.length === 2
       && exp[0] === QueryKeyword.Not

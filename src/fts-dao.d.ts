@@ -8,7 +8,7 @@ interface IFTSDAO {
 
   query(
     namespace: string
-  , expression: QueryExpression
+  , expression: IQueryExpression
   , options: { limit?: number; offset?: number }
   ): AsyncIterable<string>
 

@@ -5,36 +5,36 @@ interface IStats {
   objects: number
 }
 
-type QueryExpression =
-| WordExpression
-| PhraseExpression
-| PrefixExpression
-| AndExpression
-| OrExpression
-| NotExpression
+type IQueryExpression =
+| IWordExpression
+| IPhraseExpression
+| IPrefixExpression
+| IAndExpression
+| IOrExpression
+| INotExpression
 
-type WordExpression = string
-type PhraseExpression = [
-  import('./keyword').QueryKeyword.Phrase
-, ...QueryExpression[]
+type IWordExpression = string
+type IPhraseExpression = [
+  import('./query-keyword').QueryKeyword.Phrase
+, ...IQueryExpression[]
 ]
-type PrefixExpression = [
-  import('./keyword').QueryKeyword.Prefix
+type IPrefixExpression = [
+  import('./query-keyword').QueryKeyword.Prefix
 , string
 ]
-type AndExpression = [
-  QueryExpression
-, import('./keyword').QueryKeyword.And
-, QueryExpression
+type IAndExpression = [
+  IQueryExpression
+, import('./query-keyword').QueryKeyword.And
+, IQueryExpression
 ]
-type OrExpression = [
-  QueryExpression
-, import('./keyword').QueryKeyword.Or
-, QueryExpression
+type IOrExpression = [
+  IQueryExpression
+, import('./query-keyword').QueryKeyword.Or
+, IQueryExpression
 ]
-type NotExpression = [
-  import('./keyword').QueryKeyword.Not
-, QueryExpression
+type INotExpression = [
+  import('./query-keyword').QueryKeyword.Not
+, IQueryExpression
 ]
 
 interface ICore {
@@ -50,7 +50,7 @@ interface ICore {
 
     query(
       namespace: string
-    , expression: QueryExpression
+    , expression: IQueryExpression
     , options: { limit?: number; offset?: number }
     ): AsyncIterable<string>
 

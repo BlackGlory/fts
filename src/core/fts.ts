@@ -22,7 +22,7 @@ export function stats(namespace: string): Promise<IStats> {
 
 export function query(
   namespace: string
-, expression: QueryExpression
+, expression: IQueryExpression
 , options: { limit?: number; offset?: number }
 ): AsyncIterable<string> {
   return FTSDAO.query(namespace, expression, options)

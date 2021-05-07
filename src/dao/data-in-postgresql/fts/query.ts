@@ -7,7 +7,7 @@ import { SortedValueCollector } from './utils/sorted-value-collector'
 
 export async function* query(
   namespace: string
-, expression: QueryExpression
+, expression: IQueryExpression
 , options: { limit?: number; offset?: number }
 ): AsyncIterable<string> {
   const { limit, offset } = options
