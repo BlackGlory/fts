@@ -3317,10 +3317,10 @@ fastify-bearer-auth@^5.1.0:
   dependencies:
     fastify-plugin "^3.0.0"
 
-fastify-cors@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/fastify-cors/-/fastify-cors-6.0.0.tgz#59764802f7260898f0ae4f9f1aa626d5e1c16a8b"
-  integrity sha512-OIvNV3EJsE0vnKkn9GIgAQiimSrc6raKTq8YBtEt8XZ4KyPyAZ6BdKDxpjPLQBQfZLgqGgcThCea53AWqI2DgA==
+fastify-cors@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/fastify-cors/-/fastify-cors-6.0.1.tgz#300e0f1cbeedda19d9de284e9cf05c65842c182b"
+  integrity sha512-eeNTdQNmBsqHL87we+X74n9+H0hTDX0cXGVdyZjGf9om2pZfigAZwuSxaUUE2pLP9tp5+rEd5kejKQ8+ZCvAoA==
   dependencies:
     fastify-plugin "^3.0.0"
     vary "^1.1.2"
@@ -4021,10 +4021,10 @@ hotypes@^0.1.4:
   resolved "https://registry.yarnpkg.com/hotypes/-/hotypes-0.1.4.tgz#c5066f9db3447247418633cef3d2c955e19ac5df"
   integrity sha512-6xl2Gwd/xTmgG1XKs3faY8bZ84w5bNkoqkakAnii7EiKr6Qpi5aCajYWU1IBIMX4m1HpfoeuKZ1RHmSPuKhi6Q==
 
-hotypes@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/hotypes/-/hotypes-0.1.9.tgz#e9a30eccb0b2bfcbeb4d458c3cc9496da6462ccd"
-  integrity sha512-cQdRgk+g8bvVcakbZV6GkLUI13Qu2jrSU9kldhm3uKM+pwUXapc/Cdot8LwvXGGazZlAMZF3sQuBEQQQbG35OA==
+hotypes@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/hotypes/-/hotypes-0.2.0.tgz#148e2baa05285e56ed3a7d5f1a97d82ca7a201ca"
+  integrity sha512-pvTMM0Zu/mBymLt8P1+1pANMgdR44po7mMxwJedGNRZ5Ixiw56tWWNB/nkLdyqqwvV8GTxGMcyv368SrAbciJw==
 
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"
@@ -8229,6 +8229,14 @@ value-getter@^0.1.13:
   dependencies:
     "@blackglory/types" "^0.4.1"
     hotypes "^0.1.3"
+
+value-getter@^0.1.14:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/value-getter/-/value-getter-0.1.14.tgz#1f644974449037fe738835520e571a3657298111"
+  integrity sha512-0qODSKu6dECzzZ/D/uuMnH38kSyDZn4ohSSIjwtAifn4iF2sFSR61ZEdNl1oPDcThFXQ/DKz+a5y7m3Hr199BA==
+  dependencies:
+    "@blackglory/types" "^0.4.2"
+    hotypes "^0.2.0"
 
 vary@^1.1.2:
   version "1.1.2"
