@@ -38,75 +38,75 @@ FTS提供的查询语言是一种AST结构的JSON数组.
 该项目曾经被设计为只支持查询单词和短语, 逻辑运算必须由客户端手动完成,
 考虑到通信延迟和查询优化方面的现实问题, 最终改成了AST的形式.
 
-#+BEGIN_EXAMPLE javascript
+#+BEGIN_SRC javascript
 ['a', AND, ['b', OR, [NOT, 'c']]]
 // 相当于 'a' AND ('b' OR (NOT 'c'))
-#+END_EXAMPLE
+#+END_SRC
 
 ***** AND = 0
 逻辑与, 左值和右值可以嵌套其他表达式.
 
 JavaScript:
-#+BEGIN_EXAMPLE js
+#+BEGIN_SRC js
 ['left', AND, 'right']
-#+END_EXAMPLE
+#+END_SRC
 
 JSON:
-#+BEGIN_EXAMPLE json
+#+BEGIN_SRC json
 ["left", 0, "right"]
-#+END_EXAMPLE
+#+END_SRC
 
 ***** OR = 1
 逻辑或, 左值和右值可以嵌套其他表达式.
 
 JavaScript:
-#+BEGIN_EXAMPLE js
+#+BEGIN_SRC js
 ['left', OR, 'right']
-#+END_EXAMPLE
+#+END_SRC
 
 JSON:
-#+BEGIN_EXAMPLE json
+#+BEGIN_SRC json
 ["left", 1, "right"]
-#+END_EXAMPLE
+#+END_SRC
 
 ***** NOT = 2
 逻辑非, 右值可以嵌套其他表达式.
 
 JavaScript:
-#+BEGIN_EXAMPLE js
+#+BEGIN_SRC js
 [NOT, 'right']
-#+END_EXAMPLE
+#+END_SRC
 
 JSON:
-#+BEGIN_EXAMPLE json
+#+BEGIN_SRC json
 [2, "right"]
-#+END_EXAMPLE
+#+END_SRC
 
 ***** PHRASE = 3
 由连续单词组成的短语.
 
 JavaScript:
-#+BEGIN_EXAMPLE js
+#+BEGIN_SRC js
 [PHRASE, 'a', 'b', 'c']
-#+END_EXAMPLE
+#+END_SRC
 
 JSON:
-#+BEGIN_EXAMPLE json
+#+BEGIN_SRC json
 [3, "a", "b", "c"]
-#+END_EXAMPLE
+#+END_SRC
 
 ***** PREFIX = 4
 由单个词素构成的前缀搜索.
 
 JavaScript:
-#+BEGIN_EXAMPLE js
+#+BEGIN_SRC js
 [PREFIX, 'a']
-#+END_EXAMPLE
+#+END_SRC
 
 JSON:
-#+BEGIN_EXAMPLE json
+#+BEGIN_SRC json
 [4, "a"]
-#+END_EXAMPLE
+#+END_SRC
 
 ** Install
 *** 配置
@@ -314,6 +314,17 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 =DELETE /fts/<namespace>/objects=
 
 删除namespace中的所有对象.
+
+**** stats
+=GET /fts/<namespace>/stats=
+
+返回统计信息.
+#+BEGIN_SRC json
+{
+  namespace: string
+  objects: number
+}
+#+END_SRC
 
 **** get all namespaces
 =GET /fts=
