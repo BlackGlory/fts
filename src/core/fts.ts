@@ -16,6 +16,10 @@ export function clear(namespace: string): Promise<void> {
   return FTSDAO.deleteAllObjects(namespace)
 }
 
+export function stats(namespace: string): Promise<IStats> {
+  return FTSDAO.stats(namespace)
+}
+
 export function query(
   namespace: string
 , expression: QueryExpression

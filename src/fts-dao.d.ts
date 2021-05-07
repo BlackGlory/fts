@@ -4,6 +4,8 @@ interface IFTSDAO {
   deleteObject(namespace: string, objectId: string): Promise<void>
   deleteAllObjects(namespace: string): Promise<void>
 
+  stats(namespace: string): Promise<IStats>
+
   query(
     namespace: string
   , expression: QueryExpression

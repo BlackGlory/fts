@@ -1,4 +1,10 @@
 type CustomErrorConsturctor = import('@blackglory/errors').CustomErrorConstructor
+
+interface IStats {
+  namespace: string
+  objects: number
+}
+
 type QueryExpression =
 | WordExpression
 | PhraseExpression
@@ -39,6 +45,8 @@ interface ICore {
 
     del(namespace: string, objectId: string): Promise<void>
     clear(namespace: string): Promise<void>
+
+    stats(namespace: string): Promise<IStats>
 
     query(
       namespace: string
