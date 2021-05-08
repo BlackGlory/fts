@@ -4,7 +4,7 @@ import { WRITE_PAYLOAD_LIMIT } from '@env'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
-  server.post<{
+  server.put<{
     Params: {
       namespace: string
       id: string

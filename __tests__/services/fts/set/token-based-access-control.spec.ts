@@ -2,7 +2,7 @@ import { startService, stopService, getAddress, closeAllConnections } from '@tes
 import { matchers } from 'jest-json-schema'
 import { AccessControlDAO } from '@dao'
 import { fetch } from 'extra-fetch'
-import { post } from 'extra-request'
+import { put } from 'extra-request'
 import { url, pathname, searchParam, json } from 'extra-request/lib/es2018/transformers'
 
 jest.mock('@dao/config-in-sqlite3/database')
@@ -24,7 +24,7 @@ describe('token-based access control', () => {
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
           await AccessControlDAO.setWriteToken({ namespace, token })
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , searchParam('token', token)
@@ -44,7 +44,7 @@ describe('token-based access control', () => {
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
           await AccessControlDAO.setWriteToken({ namespace, token })
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , searchParam('token', 'bad')
@@ -64,7 +64,7 @@ describe('token-based access control', () => {
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
           await AccessControlDAO.setWriteToken({ namespace, token })
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , json([])
@@ -83,7 +83,7 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const id = 'id'
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , json([])
@@ -100,7 +100,7 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const id = 'id'
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , json([])
@@ -122,7 +122,7 @@ describe('token-based access control', () => {
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
           await AccessControlDAO.setWriteToken({ namespace, token })
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , json([])
@@ -143,7 +143,7 @@ describe('token-based access control', () => {
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
           await AccessControlDAO.setWriteToken({ namespace, token })
 
-          const res = await fetch(post(
+          const res = await fetch(put(
             url(getAddress())
           , pathname(`/fts/${namespace}/objects/${id}`)
           , json([])
