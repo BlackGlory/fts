@@ -11,6 +11,8 @@
     "test": "jest --runInBand --config jest.config.js --no-cache",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:coverage": "jest --runInBand --coverage --config jest.config.js",
+    "dev": "nodemon",
+    "dev:http2": "cross-env FTS_HTTP2=true nodemon",
     "clean": "rimraf lib",
     "build": "run-s build:*",
     "build:compile": "tsc --project tsconfig.build.json",
