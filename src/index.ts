@@ -1,6 +1,6 @@
 import { go } from '@blackglory/go'
 import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database'
-import * as DataInPostgreSQL from '@src/dao/data-in-postgresql/utils'
+import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils'
 import { buildServer } from './server'
 import { PORT, HOST, CI } from '@env'
 
