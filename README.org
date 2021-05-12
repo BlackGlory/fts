@@ -268,7 +268,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/buckets/${bucket}/objects/${
 })
 #+END_SRC
 
-**** query in the namespace
+**** query in namespace
 ~POST /fts/<namespace>/query~
 
 通过表达式在指定namespace下查询对象的id, 返回结果为JSON数组:
@@ -306,7 +306,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/query`, {
 }).then(res => res.json())
 #+END_SRC
 
-**** query in the buckets
+**** query in buckets
 ~POST /fts/<namespace>/buckets/<bucket1>,<bucket2>...<bucketN>/query~
 
 通过表达式在多个bucket下(用 =,= 作为分隔符)查询对象的bucket和id, 返回结果为JSON数组:
@@ -381,7 +381,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 =GET /fts/<namespace>/stats=
 
 返回统计信息.
-#+BEGIN_SRC json
+#+BEGIN_SRC typescript
 {
   namespace: string
   buckets: number
@@ -393,7 +393,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 =GET /fts/<namespace>/buckets/<bucket>/stats=
 
 返回统计信息.
-#+BEGIN_SRC json
+#+BEGIN_SRC typescript
 {
   namespace: string
   bucket: string
