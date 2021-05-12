@@ -1,4 +1,4 @@
-import * as DAO from '@dao/data-in-postgresql/fts/get-all-namespaces'
+import * as DAO from '@dao/data-in-postgresql/fts/get-all-buckets'
 import { toArrayAsync } from 'iterable-operator'
 import { setRawObject } from './utils'
 import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
@@ -10,10 +10,21 @@ beforeEach(initializeDatabases)
 afterEach(clearDatabases)
 afterAll(closeAllConnections)
 
-describe('getAllNamespaces(): AsyncIterable<string>', () => {
+describe('getAllBuckets(namespace: string): AsyncIterable<string>', () => {
   describe('empty', () => {
     it('return AsyncIterable<string>', async () => {
-      const iter = DAO.getAllNamespaces()
+      const namespace1 = 'namespace-1'
+      const namespace2 = 'namespace-2'
+      const bucket = 'bucket'
+      const id = 'id'
+      await setRawObject({
+        namespace: namespace1
+      , bucket
+      , id
+      , vector: ''
+      })
+
+      const iter = DAO.getAllBuckets(namespace2)
       const result = await toArrayAsync(iter)
 
       expect(iter).toBeAsyncIterable()
@@ -24,19 +35,20 @@ describe('getAllNamespaces(): AsyncIterable<string>', () => {
   describe('not empty', () => {
     it('return AsyncIterable<string>', async () => {
       const namespace = 'namespace'
+      const bucket = 'bucket'
       const id = 'id'
       await setRawObject({
         namespace
-      , bucket: 'bucket'
+      , bucket
       , id
       , vector: ''
       })
 
-      const iter = DAO.getAllNamespaces()
+      const iter = DAO.getAllBuckets(namespace)
       const result = await toArrayAsync(iter)
 
       expect(iter).toBeAsyncIterable()
-      expect(result).toStrictEqual([namespace])
+      expect(result).toStrictEqual([bucket])
     })
   })
 })

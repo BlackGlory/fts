@@ -16,15 +16,20 @@ describe(`
   query(
     namespace: string
   , expression: QueryExpression
-  , options: { limit?: number; offset?: number }
+  , options: {
+      buckets?: string[]
+      limit?: number
+    }
   ): AsyncIterable<string> {
 `, () => {
   describe('namespace does not exist', () => {
     it('return empty iterable', async () => {
       const namespace1 = 'namespace-1'
       const namespace2 = 'naemspace-2'
+      const bucket = 'bucket'
       await setRawObject({
         namespace: namespace1
+      , bucket
       , id: 'id'
       , vector: await toVector(['one', 'two', 'three'])
       })
@@ -37,13 +42,73 @@ describe(`
     })
   })
 
+  describe('limit', () => {
+    it('return AsyncIterable', async () => {
+      const namespace = 'namespace'
+      const bucket = 'bucket'
+      const id1 = 'id-1'
+      const id2 = 'id-2'
+      await setRawObject({
+        namespace
+      , bucket
+      , id: id1
+      , vector: await toVector(['one', 'two', 'three'])
+      })
+      await setRawObject({
+        namespace
+      , bucket
+      , id: id2
+      , vector: await toVector(['one', 'two', 'three'])
+      })
+
+      const iter = await DAO.query(namespace, 'three', { limit: 1 })
+      const result = await toArrayAsync(iter)
+
+      expect(iter).toBeAsyncIterable()
+      expect(result).toStrictEqual([
+        { bucket, id: id1 }
+      ])
+    })
+  })
+
+  describe('buckets', () => {
+    it('return AsyncIterable', async () => {
+      const namespace = 'namespace'
+      const bucket1 = 'bucket-1'
+      const bucket2 = 'bucket-2'
+      const id = 'id'
+      await setRawObject({
+        namespace
+      , bucket: bucket1
+      , id
+      , vector: await toVector(['one', 'two', 'three'])
+      })
+      await setRawObject({
+        namespace
+      , bucket: bucket2
+      , id
+      , vector: await toVector(['one', 'two', 'three'])
+      })
+
+      const iter = await DAO.query(namespace, 'three', { buckets: [bucket1] })
+      const result = await toArrayAsync(iter)
+
+      expect(iter).toBeAsyncIterable()
+      expect(result).toStrictEqual([
+        { bucket: bucket1, id }
+      ])
+    })
+  })
+
   describe('word expression', () => {
     describe('not matched', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two'])
         })
@@ -57,11 +122,13 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -70,18 +137,22 @@ describe(`
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })
 
   describe('phrase expression', () => {
     describe('not matched', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -99,11 +170,13 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -116,18 +189,22 @@ describe(`
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })
 
   describe('prefix expression', () => {
     describe('not match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one'])
         })
@@ -141,11 +218,13 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -154,18 +233,22 @@ describe(`
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })
 
   describe('and expression', () => {
     describe('not match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -179,31 +262,41 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, ['one', QueryKeyword.And, 'three'], {})
+        const iter = await DAO.query(
+          namespace
+        , ['one', QueryKeyword.And, 'three']
+        , {}
+        )
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })
 
   describe('or expression', () => {
     describe('not match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -217,11 +310,13 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -230,18 +325,22 @@ describe(`
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })
 
   describe('not expression', () => {
     describe('not match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -255,11 +354,13 @@ describe(`
     })
 
     describe('match', () => {
-      it('return AsyncIterable<string>', async () => {
+      it('return AsyncIterable', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await setRawObject({
           namespace
+        , bucket
         , id
         , vector: await toVector(['one', 'two', 'three'])
         })
@@ -268,7 +369,9 @@ describe(`
         const result = await toArrayAsync(iter)
 
         expect(iter).toBeAsyncIterable()
-        expect(result).toStrictEqual([id])
+        expect(result).toStrictEqual([
+          { bucket, id }
+        ])
       })
     })
   })

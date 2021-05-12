@@ -19,13 +19,14 @@ describe('token-based access control', () => {
         it('204', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           await AccessControlDAO.setDeleteTokenRequired(namespace, true)
           await AccessControlDAO.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           , searchParam('token', token)
           ))
 
@@ -37,13 +38,14 @@ describe('token-based access control', () => {
         it('401', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           await AccessControlDAO.setDeleteTokenRequired(namespace, true)
           await AccessControlDAO.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           , searchParam('token', 'bad')
           ))
 
@@ -55,13 +57,14 @@ describe('token-based access control', () => {
         it('401', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           await AccessControlDAO.setDeleteTokenRequired(namespace, true)
           await AccessControlDAO.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           ))
 
           expect(res.status).toBe(401)
@@ -75,10 +78,11 @@ describe('token-based access control', () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           process.env.FTS_DELETE_TOKEN_REQUIRED = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           ))
 
           expect(res.status).toBe(401)
@@ -89,10 +93,11 @@ describe('token-based access control', () => {
         it('204', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           ))
 
           expect(res.status).toBe(204)
@@ -106,13 +111,14 @@ describe('token-based access control', () => {
       describe('no token', () => {
         it('204', async () => {
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           await AccessControlDAO.setDeleteTokenRequired(namespace, true)
           await AccessControlDAO.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           ))
 
           expect(res.status).toBe(204)
@@ -125,13 +131,14 @@ describe('token-based access control', () => {
         it('204', async () => {
           process.env.FTS_DELETE_TOKEN_REQUIRED = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           await AccessControlDAO.setDeleteTokenRequired(namespace, true)
           await AccessControlDAO.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}`)
           ))
 
           expect(res.status).toBe(204)

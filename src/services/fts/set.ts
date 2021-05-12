@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, tokenSchema, lexemesSchema, idSchema } from '@src/schema'
+import { namespaceSchema, bucketSchema, tokenSchema, lexemesSchema, idSchema }
+  from '@src/schema'
 import { WRITE_PAYLOAD_LIMIT } from '@env'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
@@ -7,16 +8,18 @@ async function routes(server, { Core }) {
   server.put<{
     Params: {
       namespace: string
+      bucket: string
       id: string
     }
     Querystring: { token?: string }
     Body: string[]
   }>(
-    '/fts/:namespace/objects/:id'
+    '/fts/:namespace/buckets/:bucket/objects/:id'
   , {
       schema: {
         params: {
           namespace: namespaceSchema
+        , bucket: bucketSchema
         , id: idSchema
         }
       , body: lexemesSchema
@@ -28,8 +31,7 @@ async function routes(server, { Core }) {
     , bodyLimit: WRITE_PAYLOAD_LIMIT()
     }
   , async (req, reply) => {
-      const namespace = req.params.namespace
-      const id = req.params.id
+      const { namespace, bucket, id } = req.params
       const lexemes = req.body
       const token = req.query.token
 
@@ -44,7 +46,7 @@ async function routes(server, { Core }) {
         throw e
       }
 
-      await Core.FTS.set(namespace, id, lexemes)
+      await Core.FTS.set(namespace, bucket, id, lexemes)
       reply.status(204).send()
     }
   )

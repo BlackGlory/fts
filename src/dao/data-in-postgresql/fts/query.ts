@@ -8,9 +8,12 @@ import { SortedValueCollector } from './utils/sorted-value-collector'
 export async function* query(
   namespace: string
 , expression: IQueryExpression
-, options: { limit?: number; offset?: number }
-): AsyncIterable<string> {
-  const { limit, offset } = options
+, options: {
+    buckets?: string[]
+    limit?: number
+  }
+): AsyncIterable<IQueryResult> {
+  const { limit, buckets } = options
   const collector = new SortedValueCollector()
   const tsquery = convertExpressionToTsquery(expression, collector, { prefix: 'param' })
   const queryParameters = convertArrayToObject(collector.values, { prefix: 'param' })
@@ -23,15 +26,22 @@ export async function* query(
 
   // 最终采用 enable_seqscan = OFF 是因为它在任何一种情况下的查询性能都算不上差,
   // 而且在此案例中根本不可能存在顺序扫描.
-  const rows = await db.manyOrNone<{ id: string; rank: number }>(sql`
+  const rows = await db.manyOrNone<{
+    bucket: string
+    id: string
+  }>(sql`
       SET LOCAL enable_seqscan = OFF;
       SELECT id
+           , bucket
         FROM fts_object
        WHERE vector @@ ${tsquery}
          AND namespace = $(namespace)
+    ${buckets && 'AND bucket IN ($(buckets:list))'}
     ${limit && 'LIMIT $(limit)'}
-    ${offset && 'OFFSET $(offset)'};
-  `, { namespace, limit, offset, ...queryParameters })
+  `, { namespace, buckets, limit, ...queryParameters })
 
-  yield* rows.map(x => x.id)
+  yield* rows.map(x => ({
+    bucket: x.bucket
+  , id: x.id
+  }))
 }

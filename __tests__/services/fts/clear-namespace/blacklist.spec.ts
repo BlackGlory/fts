@@ -18,13 +18,11 @@ describe('blacklist', () => {
       it('403', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
-        const bucket = 'bucket'
-        const id = 'id'
         await AccessControlDAO.addBlacklistItem(namespace)
 
         const res = await fetch(del(
           url(getAddress())
-        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
+        , pathname(`/fts/${namespace}`)
         ))
 
         expect(res.status).toBe(403)
@@ -35,12 +33,10 @@ describe('blacklist', () => {
       it('204', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
-        const bucket = 'bucket'
-        const id = 'id'
 
         const res = await fetch(del(
           url(getAddress())
-        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
+        , pathname(`/fts/${namespace}`)
         ))
 
         expect(res.status).toBe(204)
@@ -52,13 +48,11 @@ describe('blacklist', () => {
     describe('namespace in blacklist', () => {
       it('204', async () => {
         const namespace = 'namespace'
-        const bucket = 'bucket'
-        const id = 'id'
         await AccessControlDAO.addBlacklistItem(namespace)
 
         const res = await fetch(del(
           url(getAddress())
-        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
+        , pathname(`/fts/${namespace}`)
         ))
 
         expect(res.status).toBe(204)

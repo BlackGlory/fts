@@ -1,24 +1,16 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, bucketSchema, tokenSchema, idSchema } from '@src/schema'
+import { namespaceSchema, tokenSchema } from '@src/schema'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
   server.delete<{
-    Params: {
-      namespace: string
-      bucket: string
-      id: string
-    }
+    Params: { namespace: string }
     Querystring: { token?: string }
   }>(
-    '/fts/:namespace/buckets/:bucket/objects/:id'
+    '/fts/:namespace'
   , {
       schema: {
-        params: {
-          namespace: namespaceSchema
-        , bucket: bucketSchema
-        , id: idSchema
-        }
+        params: { namespace: namespaceSchema }
       , querystring: { token: tokenSchema }
       , response: {
           204: { type: 'null' }
@@ -26,7 +18,7 @@ async function routes(server, { Core }) {
       }
     }
   , async (req, reply) => {
-      const { namespace, bucket, id } = req.params
+      const namespace = req.params.namespace
       const token = req.query.token
 
       try {
@@ -40,7 +32,7 @@ async function routes(server, { Core }) {
         throw e
       }
 
-      await Core.FTS.del(namespace, bucket, id)
+      await Core.FTS.clearNamespace(namespace)
       reply.status(204).send()
     }
   )

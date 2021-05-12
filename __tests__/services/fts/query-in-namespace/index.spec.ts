@@ -30,7 +30,8 @@ describe('no access control', () => {
     , items: {
         type: 'object'
       , properties: {
-          payload: { type: 'string' }
+          bucket: { type: 'string' }
+        , id: { type: 'string' }
         }
       }
     })

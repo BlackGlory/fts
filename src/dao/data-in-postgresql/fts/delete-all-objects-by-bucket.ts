@@ -1,14 +1,12 @@
 import { db } from '../database'
 
-export async function deleteObject(
+export async function deleteAllObjectsByBucket(
   namespace: string
 , bucket: string
-, id: string
 ): Promise<void> {
   await db.none(`
     DELETE FROM fts_object
      WHERE namespace = $(namespace)
        AND bucket = $(bucket)
-       AND id = $(id)
-  `, { namespace, bucket, id })
+  `, { namespace, bucket })
 }

@@ -1,8 +1,8 @@
 import { startService, stopService, getAddress, closeAllConnections } from '@test/utils'
 import { matchers } from 'jest-json-schema'
 import { fetch } from 'extra-fetch'
-import { put } from 'extra-request'
-import { url, pathname, json } from 'extra-request/lib/es2018/transformers'
+import { get } from 'extra-request'
+import { url, pathname } from 'extra-request/lib/es2018/transformers'
 
 jest.mock('@dao/config-in-sqlite3/database')
 expect.extend(matchers)
@@ -12,17 +12,19 @@ afterEach(stopService)
 afterAll(closeAllConnections)
 
 describe('no access control', () => {
-  it('204', async () => {
+  it('200', async () => {
     const namespace = 'namespace'
-    const bucket = 'bucket'
-    const id = 'id'
 
-    const res = await fetch(put(
+    const res = await fetch(get(
       url(getAddress())
-    , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
-    , json([])
+    , pathname(`/fts/${namespace}/stats`)
     ))
 
-    expect(res.status).toBe(204)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toStrictEqual({
+      namespace
+    , buckets: 0
+    , objects: 0
+    })
   })
 })

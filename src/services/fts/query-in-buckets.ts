@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, tokenSchema } from '@src/schema'
+import { namespaceSchema, bucketsSchema, tokenSchema } from '@src/schema'
 import { Readable } from 'stream'
 import { stringifyJSONStreamAsync, stringifyNDJSONStreamAsync } from 'extra-generator'
 import accepts from 'fastify-accepts'
@@ -13,27 +13,34 @@ async function routes(server, { Core }) {
     Querystring: {
       token?: string
       limit?: number
-      offset?: number
     }
     Body: any
   }>(
-    '/fts/:namespace/query'
+    '/fts/:namespace/buckets/:buckets/query'
   , {
       schema: {
         params: {
           namespace: namespaceSchema
+        , buckets: bucketsSchema
         }
       , querystring: {
           limit: { type: 'integer', exclusiveMinimum: 0 }
-        , offset: { type: 'integer', minimum: 0 }
         , token: tokenSchema
+        }
+      , response: {
+          200: {
+            type: 'array'
+          , items: {
+              bucket: { type: 'string' }
+            , id: { type: 'string' }
+            }
+          }
         }
       }
     }
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.query.token
-      const offset = req.query.offset
       const limit = req.query.limit
       const expression = req.body
 
@@ -48,7 +55,7 @@ async function routes(server, { Core }) {
         throw e
       }
 
-      const results = Core.FTS.query(namespace, expression, { limit, offset })
+      const results = Core.FTS.query(namespace, expression, { limit })
       const accept = req.accepts().type([
         'application/json'
       , 'application/x-ndjson'

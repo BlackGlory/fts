@@ -18,12 +18,13 @@ describe('blacklist', () => {
       it('403', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await AccessControlDAO.addBlacklistItem(namespace)
 
         const res = await fetch(put(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects/${id}`)
+        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
         , json([])
         ))
 
@@ -35,11 +36,12 @@ describe('blacklist', () => {
       it('204', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
 
         const res = await fetch(put(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects/${id}`)
+        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
         , json([])
         ))
 
@@ -52,12 +54,13 @@ describe('blacklist', () => {
     describe('namespace in blacklist', () => {
       it('204', async () => {
         const namespace = 'namespace'
+        const bucket = 'bucket'
         const id = 'id'
         await AccessControlDAO.addBlacklistItem(namespace)
 
         const res = await fetch(put(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects/${id}`)
+        , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
         , json([])
         ))
 

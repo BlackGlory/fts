@@ -19,15 +19,17 @@ describe(`
 `, () => {
   it('set object', async () => {
     const namespace = 'namespace'
+    const bucket = 'bucket'
     const id = 'id'
     const lexemes = ['lexeme']
 
-    const result = await DAO.setObject(namespace, id, lexemes)
-    const obj = await getRawObject(namespace, id)
+    const result = await DAO.setObject(namespace, bucket, id, lexemes)
+    const obj = await getRawObject(namespace, bucket, id)
 
     expect(result).toBeUndefined()
     expect(obj).toStrictEqual({
       namespace
+    , bucket
     , id
     , vector: await toVector(lexemes)
     })

@@ -19,6 +19,7 @@ describe('token-based access control', () => {
         it('204', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
@@ -26,7 +27,7 @@ describe('token-based access control', () => {
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , searchParam('token', token)
           , json([])
           ))
@@ -39,6 +40,7 @@ describe('token-based access control', () => {
         it('401', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
@@ -46,7 +48,7 @@ describe('token-based access control', () => {
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , searchParam('token', 'bad')
           , json([])
           ))
@@ -59,6 +61,7 @@ describe('token-based access control', () => {
         it('401', async () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
@@ -66,7 +69,7 @@ describe('token-based access control', () => {
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , json([])
           ))
 
@@ -81,11 +84,12 @@ describe('token-based access control', () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           process.env.FTS_WRITE_TOKEN_REQUIRED = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const id = 'id'
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , json([])
           ))
 
@@ -98,11 +102,12 @@ describe('token-based access control', () => {
           process.env.FTS_TOKEN_BASED_ACCESS_CONTROL = 'true'
           process.env.FTS_WRITE_TOKEN_REQUIRED = 'false'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const id = 'id'
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , json([])
           ))
 
@@ -117,6 +122,7 @@ describe('token-based access control', () => {
       describe('no token', () => {
         it('204', async () => {
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
@@ -124,7 +130,7 @@ describe('token-based access control', () => {
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , json([])
           ))
 
@@ -138,6 +144,7 @@ describe('token-based access control', () => {
         it('204', async () => {
           process.env.FTS_WRITE_TOKEN_REQUIRED = 'true'
           const namespace = 'namespace'
+          const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
           await AccessControlDAO.setWriteTokenRequired(namespace, true)
@@ -145,7 +152,7 @@ describe('token-based access control', () => {
 
           const res = await fetch(put(
             url(getAddress())
-          , pathname(`/fts/${namespace}/objects/${id}`)
+          , pathname(`/fts/${namespace}/buckets/${bucket}/objects/${id}`)
           , json([])
           ))
 

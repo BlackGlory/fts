@@ -2,6 +2,7 @@ import { db } from '@dao/data-in-postgresql/database'
 
 interface IRawObject {
   namespace: string
+  bucket: string
   id: string
   vector: string
 }
@@ -17,9 +18,10 @@ export async function toVector(lexemes: string[]): Promise<string> {
 
 export async function setRawObject(raw: IRawObject): Promise<IRawObject> {
   await db.none(`
-    INSERT INTO fts_object (namespace, id, vector)
+    INSERT INTO fts_object (namespace, bucket, id, vector)
     VALUES (
       $(namespace)
+    , $(bucket)
     , $(id)
     , $(vector)::tsvector
     )
@@ -28,26 +30,34 @@ export async function setRawObject(raw: IRawObject): Promise<IRawObject> {
   return raw
 }
 
-export async function hasRawObject(namespace: string, id: string): Promise<boolean> {
-  return !!await getRawObject(namespace, id)
+export async function hasRawObject(
+  namespace: string
+, bucket: string
+, id: string
+): Promise<boolean> {
+  return !!await getRawObject(namespace, bucket, id)
 }
 
 export async function getRawObject(
   namespace: string
+, bucket: string
 , id: string
 ): Promise<IRawObject | null> {
   const result = await db.oneOrNone<{
     namespace: string
+    bucket: string
     id: string
     vector: string
   }>(`
     SELECT namespace
+         , bucket
          , id
          , vector
       FROM fts_object
      WHERE namespace = $(namespace)
+       AND bucket =  $(bucket)
        AND id = $(id)
-  `, { namespace, id })
+  `, { namespace, bucket, id })
   if (!result) return null
 
   return result

@@ -15,7 +15,7 @@ afterAll(closeAllConnections)
 
 describe('no access control', () => {
   it('200', async () => {
-    const namespaces = ['namespace']
+    const namespaces = ['namespace-1', 'namespace-2']
     await prepareFTSs(namespaces)
 
     const res = await fetch(get(

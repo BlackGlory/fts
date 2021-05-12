@@ -1,8 +1,20 @@
 type CustomErrorConsturctor = import('@blackglory/errors').CustomErrorConstructor
 
-interface IStats {
+interface INamespaceStats {
   namespace: string
+  buckets: number
   objects: number
+}
+
+interface IBucketStats {
+  namespace: string
+  bucket: string
+  objects: number
+}
+
+interface IQueryResult {
+ bucket: string
+ id: string
 }
 
 type IQueryExpression =
@@ -41,20 +53,31 @@ interface ICore {
   isAdmin(password: string): boolean
 
   FTS: {
-    set(namespace: string, objectId: string, lexemes: string[]): Promise<void>
+    set(
+      namespace: string
+    , bucket: string
+    , objectId: string
+    , lexemes: string[]
+    ): Promise<void>
 
-    del(namespace: string, objectId: string): Promise<void>
-    clear(namespace: string): Promise<void>
+    del(namespace: string, bucket: string, objectId: string): Promise<void>
+    clearNamespace(namespace: string): Promise<void>
+    clearBucket(namespace: string, bucket: string): Promise<void>
 
-    stats(namespace: string): Promise<IStats>
+    getNamespaceStats(namespace: string): Promise<INamespaceStats>
+    getBucketStats(namespace: string, bucket: string): Promise<IBucketStats>
 
     query(
       namespace: string
     , expression: IQueryExpression
-    , options: { limit?: number; offset?: number }
-    ): AsyncIterable<string>
+    , options: {
+        limit?: number
+        buckets?: string[]
+      }
+    ): AsyncIterable<IQueryResult>
 
     getAllNamespaces(): AsyncIterable<string>
+    getAllBuckets(namespace: string): AsyncIterable<string>
   }
 
   Blacklist: {

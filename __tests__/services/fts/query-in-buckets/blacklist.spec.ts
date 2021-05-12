@@ -1,12 +1,10 @@
 import { startService, stopService, getAddress, closeAllConnections } from '@test/utils'
-import { matchers } from 'jest-json-schema'
 import { AccessControlDAO } from '@dao'
 import { fetch } from 'extra-fetch'
-import { del } from 'extra-request'
-import { url, pathname } from 'extra-request/lib/es2018/transformers'
+import { post } from 'extra-request'
+import { url, pathname, json } from 'extra-request/lib/es2018/transformers'
 
 jest.mock('@dao/config-in-sqlite3/database')
-expect.extend(matchers)
 
 beforeEach(startService)
 afterEach(stopService)
@@ -18,11 +16,13 @@ describe('blacklist', () => {
       it('403', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
+        const buckets = ['bucket-1', 'bucket-2'].join(',')
         await AccessControlDAO.addBlacklistItem(namespace)
 
-        const res = await fetch(del(
+        const res = await fetch(post(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects`)
+        , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+        , json('')
         ))
 
         expect(res.status).toBe(403)
@@ -30,32 +30,36 @@ describe('blacklist', () => {
     })
 
     describe('namespace not in blacklist', () => {
-      it('204', async () => {
+      it('200', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
+        const buckets = ['bucket-1', 'bucket-2'].join(',')
 
-        const res = await fetch(del(
+        const res = await fetch(post(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects`)
+        , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+        , json('')
         ))
 
-        expect(res.status).toBe(204)
+        expect(res.status).toBe(200)
       })
     })
   })
 
   describe('disabled', () => {
     describe('namespace in blacklist', () => {
-      it('204', async () => {
+      it('200', async () => {
         const namespace = 'namespace'
+        const buckets = ['bucket-1', 'bucket-2'].join(',')
         await AccessControlDAO.addBlacklistItem(namespace)
 
-        const res = await fetch(del(
+        const res = await fetch(post(
           url(getAddress())
-        , pathname(`/fts/${namespace}/objects`)
+        , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+        , json('')
         ))
 
-        expect(res.status).toBe(204)
+        expect(res.status).toBe(200)
       })
     })
   })
