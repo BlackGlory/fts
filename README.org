@@ -14,7 +14,7 @@ FTS重新思考了传统全文搜索引擎的功能, 将其简化为更具有自
 FTS有意简化了数据库和分词器, 将调用数据库和分词的大多数职责交给客户端控制.
 如此设计是因为现实世界中数据库方案和分词方案种类繁多, 绑定特定的方案只会徒增耦合性.
 
-**** 仅存储vector和标识符
+**** 存储vector和标识符
 FTS是一个提供vector到标识符的键值对数据库, 标识符是另一个数据库中的键.
 
 客户端查询得到标识符后, 需在另一个数据库中查找这些标识符并进一步处理以得到搜索结果.
@@ -32,6 +32,13 @@ FTS现阶段在更新词典时必须通过HTTP API手动刷新整个倒排索引
 理论上可以用WebSocket降低通信成本, 但目前还没有计划实现.
 
 *** 搜索
+**** 不支持排序
+支持对全文搜索的结果排序是一个难题:
+- 查询的构建是动态的, 排序查询结果是一项无法通过索引加速的I/O密集型操作, 在记录数较多的场合效率非常低下.
+- 在不同的场景下有多种不同的排序方法, 如需支持排序, 则"如何设计配置项"会成为决策层面的难题.
+
+由于上述原因, FTS无法支持排序.
+
 **** 查询语言
 FTS提供的查询语言是一种AST结构的JSON数组.
 
@@ -221,11 +228,11 @@ volumes:
 #+END_SRC
 
 ** API
-所有API中的namespace和id都需要满足此正则表达式: =^[a-zA-Z0-9\.\-_]{0,255}$=
+所有API中的namespace, bucket和id都需要满足此正则表达式: =^[a-zA-Z0-9\.\-_]{0,255}$=
 
 *** Public
 **** set
-=PUT /fts/<namespace>/objects/<id>=
+=PUT /fts/<namespace>/buckets/<bucket>/objects/<id>=
 
 往特定namespace的指定对象中写入lexemes:
 #+BEGIN_SRC typescript
@@ -238,7 +245,7 @@ string[]
 为了确保查询不受后端差异性的影响, 应该总是进行预处理, 将lexemes和查询都转换为统一的大写或小写形式.
 
 如果开启基于token的访问控制, 则可能需要在Querystring提供具有write权限的token:
-=PUT /fts/<namespace>/objects/<id>?token=<token>=
+=PUT /fts/<namespace>/buckets/<bucket>/objects/<id>?token=<token>=
 
 ***** Example
 ****** curl
@@ -247,12 +254,12 @@ curl \
   --request PUT \
   --header 'Content-Type: application/json' \
   --data '[]' \
-  "http://localhost:8080/fts/$namespace/objects/${id}"
+  "http://localhost:8080/fts/$namespace/buckets/$bucket/objects/${id}"
 #+END_SRC
 
 ****** JavaScript
 #+BEGIN_SRC js
-await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
+await fetch(`http://localhost:8080/fts/${namespace}/buckets/${bucket}/objects/${id}`, {
   method: 'POST'
 , headers: {
     'Content-Type': 'application/json'
@@ -261,12 +268,21 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 })
 #+END_SRC
 
-**** query
+**** query in the namespace
 ~POST /fts/<namespace>/query~
 
-通过表达式查询对象的id, 返回结果为JSON数组 =string[]=.
+通过表达式在指定namespace下查询对象的id, 返回结果为JSON数组:
+#+BEGIN_EXAMPLE typescript
+Array<{
+  bucket: string
+  id: string
+}>
+#+END_EXAMPLE
 
-可以用querystring =offset= 和 =limit= 限制返回的查询结果数量.
+querystring:
+- =limit= integer, 限制返回的查询结果数量.
+
+查询结果本身不是稳定的, 相同的查询可能得到不同的结果.
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
@@ -284,13 +300,54 @@ curl \
 
 ****** JavaScript
 #+BEGIN_SRC js
-await fetch(`http://localhost:8080/fts/${namespace}/query`, {  }).then(res => res.json())
+await fetch(`http://localhost:8080/fts/${namespace}/query`, {
+  method: 'POST'
+, body: JSON.stringify(expression)
+}).then(res => res.json())
+#+END_SRC
+
+**** query in the buckets
+~POST /fts/<namespace>/buckets/<bucket1>,<bucket2>...<bucketN>/query~
+
+通过表达式在多个bucket下(用 =,= 作为分隔符)查询对象的bucket和id, 返回结果为JSON数组:
+#+BEGIN_EXAMPLE typescript
+Array<{
+  bucket: string
+  id: string
+}>
+#+END_EXAMPLE
+
+querystring:
+- =limit= integer, 限制返回的查询结果数量.
+
+查询结果本身不是稳定的, 相同的查询可能得到不同的结果.
+
+此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
+
+如果开启基于token的访问控制, 则可能需要在Querystring提供具有query权限的token:
+=/fts/<namespace>/objects?token=<token>=
+
+***** Example
+****** curl
+#+BEGIN_SRC sh
+curl \
+  --header 'Content-Type: application/json' \
+  --data '"expression"' \
+  "http://localhost:8080/fts/$namespace/buckets/$buckets/query"
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/fts/${namespace}/buckets/${buckets.join(',')}/query`, {
+  method: 'POST'
+, body: JSON.stringify(expression)
+}).then(res => res.json())
 #+END_SRC
 
 **** delete
-=DELETE /fts/<namespace>/objects/<id>=
+=DELETE /fts/<namespace>/buckets/<bucket>/objects/<id>=
 
-删除特定namespace中的对象.
+删除特定namespace和bucket中的对象.
 
 如果开启基于token的访问控制, 则可能需要在Querystring提供具有delete权限的token:
 =/fts/<namespace>/objects/<id>?token=<token>=
@@ -310,18 +367,36 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 })
 #+END_SRC
 
-**** clear
-=DELETE /fts/<namespace>/objects=
+**** clear namespace
+=DELETE /fts/<namespace>=
 
 删除namespace中的所有对象.
 
-**** stats
+**** clear bucket
+=DELETE /fts/<namespace>/buckets/<bucket>=
+
+删除bucket中的所有对象.
+
+**** get namespace stats
 =GET /fts/<namespace>/stats=
 
 返回统计信息.
 #+BEGIN_SRC json
 {
   namespace: string
+  buckets: number
+  objects: number
+}
+#+END_SRC
+
+**** get bucket stats 
+=GET /fts/<namespace>/buckets/<bucket>/stats=
+
+返回统计信息.
+#+BEGIN_SRC json
+{
+  namespace: string
+  bucket: string
   objects: number
 }
 #+END_SRC
@@ -330,7 +405,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 =GET /fts=
 
 列出所有的namespace.
-输出JSON =Array<string>=.
+返回JSON =Array<string>=.
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
@@ -343,6 +418,25 @@ curl 'http://localhost:8080/fts'
 ****** JavaScript
 #+BEGIN_SRC js
 await fetch('http://localhost:8080/fts').then(res => res.json())
+#+END_SRC
+
+**** get all buckets
+=GET /fts/<namespace>/buckets=
+
+列出namespace下的所有bucket.
+返回JSON =Array<string>=.
+
+此操作支持返回ndjson格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
+
+***** Example 
+****** curl
+#+BEGIN_SRC sh
+curl 'http://localhost:8080/fts/$namespace/buckets'
+#+END_SRC
+
+****** JavaScript
+#+BEGIN_SRC js
+await fetch(`http://localhost:8080/fts/${namespace}/buckets/${bucket}`).then(res => res.json())
 #+END_SRC
 
 *** Private
