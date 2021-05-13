@@ -24,6 +24,7 @@ describe('whitelist', () => {
         const res = await fetch(post(
           url(getAddress())
         , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+        , json('')
         ))
 
         expect(res.status).toBe(200)
@@ -55,6 +56,7 @@ describe('whitelist', () => {
         const res = await fetch(post(
           url(getAddress())
         , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+        , json('')
         ))
 
         expect(res.status).toBe(200)

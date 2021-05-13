@@ -3145,6 +3145,13 @@ extra-generator@^0.2.4:
   dependencies:
     "@blackglory/errors" "^1.1.2"
 
+extra-generator@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/extra-generator/-/extra-generator-0.2.5.tgz#34b9d6053fc47c1f98b29c6bde3db759a6c8e988"
+  integrity sha512-p1Be8fgTrWlnZH4XqT6zQJExcHGMW7uddSeFQYPKuK2+tpBixi0w/AUNgJ5KGU68r+s7CcaplovJ/yjfqmyPPQ==
+  dependencies:
+    "@blackglory/errors" "^1.1.2"
+
 extra-logger@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/extra-logger/-/extra-logger-0.2.1.tgz#6874bbe6c5c66d21bf7982d921205dc78c2f4f27"

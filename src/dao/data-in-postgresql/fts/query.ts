@@ -32,10 +32,10 @@ export async function* query(
   }>(sql`
       SET LOCAL enable_seqscan = OFF;
       SELECT id
-           , bucket
+          , bucket
         FROM fts_object
-       WHERE vector @@ ${tsquery}
-         AND namespace = $(namespace)
+      WHERE vector @@ ${tsquery}
+        AND namespace = $(namespace)
     ${buckets && 'AND bucket IN ($(buckets:list))'}
     ${limit && 'LIMIT $(limit)'}
   `, { namespace, buckets, limit, ...queryParameters })

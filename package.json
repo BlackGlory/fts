@@ -91,7 +91,7 @@
     "common-tags": "^1.8.0",
     "dotenv": "^9.0.2",
     "extra-filesystem": "^0.2.20",
-    "extra-generator": "^0.2.4",
+    "extra-generator": "^0.2.5",
     "extra-promise": "^0.16.4",
     "extra-sql-builder": "^0.2.4",
     "extra-timers": "^0.2.1",

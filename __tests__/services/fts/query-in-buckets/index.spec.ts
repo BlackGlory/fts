@@ -54,4 +54,17 @@ describe('no access control', () => {
     expect(res.status).toBe(200)
     expect(result.length).toBe(0)
   })
+
+  test('bad request', async () => {
+    const namespace = 'namespace'
+    const buckets = ['bucket-1', 'bucket-2'].join(',')
+
+    const res = await fetch(post(
+      url(getAddress())
+    , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
+    , json('bad expression')
+    ))
+
+    expect(res.status).toBe(400)
+  })
 })

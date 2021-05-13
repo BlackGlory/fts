@@ -30,15 +30,6 @@ async function routes(server, { Core }) {
           limit: { type: 'integer', exclusiveMinimum: 0 }
         , token: tokenSchema
         }
-      , response: {
-          200: {
-            type: 'array'
-          , items: {
-              bucket: { type: 'string' }
-            , id: { type: 'string' }
-            }
-          }
-        }
       }
     }
   , async (req, reply) => {
@@ -65,15 +56,19 @@ async function routes(server, { Core }) {
       , 'application/x-ndjson'
       ])
       if (accept === 'application/x-ndjson') {
+        const stream = Readable.from(stringifyNDJSONStreamAsync(results))
+        stream.once('error', err => reply.status(400).send(err))
         reply
           .status(200)
           .header('Content-Type', 'application/x-ndjson')
-          .send(Readable.from(stringifyNDJSONStreamAsync(results)))
+          .send(stream)
       } else {
+        const stream = Readable.from(stringifyJSONStreamAsync(results))
+        stream.once('error', err => reply.status(400).send(err))
         reply
           .status(200)
           .header('Content-Type', 'application/json')
-          .send(Readable.from(stringifyJSONStreamAsync(results)))
+          .send(stream)
       }
     }
   )

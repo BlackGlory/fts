@@ -1,4 +1,5 @@
-import { startService, stopService, getAddress, closeAllConnections } from '@test/utils'
+import { startService, stopService, getAddress, closeAllConnections }
+  from '@test/utils'
 import { matchers } from 'jest-json-schema'
 import { prepareFTSs } from './utils'
 import { fetch } from 'extra-fetch'
@@ -51,5 +52,17 @@ describe('no access control', () => {
 
     expect(res.status).toBe(200)
     expect(result.length).toBe(0)
+  })
+
+  test('bad request', async () => {
+    const namespace = 'namespace'
+
+    const res = await fetch(post(
+      url(getAddress())
+    , pathname(`/fts/${namespace}/query`)
+    , json('bad expression')
+    ))
+
+    expect(res.status).toBe(400)
   })
 })
