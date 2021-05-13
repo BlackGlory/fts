@@ -9,7 +9,10 @@ async function routes(server, { Core }) {
   server.register(accepts)
 
   server.post<{
-    Params: { namespace: string }
+    Params: {
+      namespace: string
+      buckets: string
+    }
     Querystring: {
       token?: string
       limit?: number
@@ -40,6 +43,7 @@ async function routes(server, { Core }) {
     }
   , async (req, reply) => {
       const namespace = req.params.namespace
+      const buckets = req.params.buckets.split(',')
       const token = req.query.token
       const limit = req.query.limit
       const expression = req.body
@@ -55,7 +59,7 @@ async function routes(server, { Core }) {
         throw e
       }
 
-      const results = Core.FTS.query(namespace, expression, { limit })
+      const results = Core.FTS.query(namespace, expression, { buckets, limit })
       const accept = req.accepts().type([
         'application/json'
       , 'application/x-ndjson'

@@ -21,11 +21,13 @@ describe('no access control', () => {
     const res = await fetch(post(
       url(getAddress())
     , pathname(`/fts/${namespace}/query`)
-    , json('')
+    , json('lexeme')
     ))
+    const result = await toJSON<IQueryResult[]>(res)
 
     expect(res.status).toBe(200)
-    expect(await toJSON(res)).toMatchSchema({
+    expect(result.length).toBeGreaterThanOrEqual(1)
+    expect(result).toMatchSchema({
       type: 'array'
     , items: {
         type: 'object'

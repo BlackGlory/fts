@@ -16,17 +16,19 @@ afterAll(closeAllConnections)
 describe('no access control', () => {
   it('200', async () => {
     const namespace = 'namespace'
-    const buckets = ['bucket-1', 'bucket-2'].join(',')
-    await prepareFTSs([namespace])
+    const buckets = ['bucket-1', 'bucket-2']
+    await prepareFTSs(buckets)
 
     const res = await fetch(post(
       url(getAddress())
-    , pathname(`/fts/${namespace}/buckets/${buckets}/query`)
-    , json('')
+    , pathname(`/fts/${namespace}/buckets/${buckets.join(',')}/query`)
+    , json('lexeme')
     ))
+    const result = await toJSON<IQueryResult[]>(res)
 
     expect(res.status).toBe(200)
-    expect(await toJSON(res)).toMatchSchema({
+    expect(result.length).toBeGreaterThanOrEqual(1)
+    expect(result).toMatchSchema({
       type: 'array'
     , items: {
         type: 'object'
