@@ -14,7 +14,7 @@ afterEach(stopService)
 afterAll(closeAllConnections)
 
 describe('no access control', () => {
-  it('200', async () => {
+  test('non-empty result', async () => {
     const namespace = 'namespace'
     await prepareFTSs([namespace])
 
@@ -37,5 +37,19 @@ describe('no access control', () => {
         }
       }
     })
+  })
+
+  test('empty result', async () => {
+    const namespace = 'namespace'
+
+    const res = await fetch(post(
+      url(getAddress())
+    , pathname(`/fts/${namespace}/query`)
+    , json('lexeme')
+    ))
+    const result = await toJSON<IQueryResult[]>(res)
+
+    expect(res.status).toBe(200)
+    expect(result.length).toBe(0)
   })
 })
