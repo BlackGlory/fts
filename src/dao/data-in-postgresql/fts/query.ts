@@ -11,9 +11,10 @@ export async function* query(
 , options: {
     buckets?: string[]
     limit?: number
+    offset?: number
   }
 ): AsyncIterable<IQueryResult> {
-  const { limit, buckets } = options
+  const { buckets, limit, offset } = options
   const collector = new SortedValueCollector()
   const tsquery = convertExpressionToTsquery(expression, collector, { prefix: 'param' })
   const queryParameters = convertArrayToObject(collector.values, { prefix: 'param' })
@@ -29,16 +30,23 @@ export async function* query(
   const rows = await db.manyOrNone<{
     bucket: string
     id: string
-  }>(sql`
+  }>(
+    sql`
       SET LOCAL enable_seqscan = OFF;
       SELECT id
-          , bucket
+           , bucket
         FROM fts_object
-      WHERE vector @@ ${tsquery}
-        AND namespace = $(namespace)
-    ${buckets && 'AND bucket IN ($(buckets:list))'}
-    ${limit && 'LIMIT $(limit)'}
-  `, { namespace, buckets, limit, ...queryParameters })
+       WHERE vector @@ ${tsquery}
+         AND namespace = $(namespace)
+      ${buckets && 'AND bucket IN ($(buckets:list))'}
+       ORDER BY namespace
+              , bucket
+              , id
+      ${limit && 'LIMIT $(limit)'}
+      ${offset && 'OFFSET $(offset)'}
+    `
+  , { namespace, buckets, limit, ...queryParameters }
+  )
 
   yield* rows.map(x => ({
     bucket: x.bucket

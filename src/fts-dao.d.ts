@@ -19,6 +19,7 @@ interface IFTSDAO {
   , options: {
       buckets?: string[]
       limit?: number
+      offset?: number
     }
   ): AsyncIterable<IQueryResult>
 

@@ -16,6 +16,7 @@ async function routes(server, { Core }) {
     Querystring: {
       token?: string
       limit?: number
+      offset?: number
     }
     Body: any
   }>(
@@ -27,7 +28,8 @@ async function routes(server, { Core }) {
         , buckets: bucketsSchema
         }
       , querystring: {
-          limit: { type: 'integer', exclusiveMinimum: 0 }
+          limit: { type: 'integer', minimum: 1 }
+        , offset: { type: 'integer', minimum: 0 }
         , token: tokenSchema
         }
       }
@@ -35,8 +37,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const buckets = req.params.buckets.split(',')
-      const token = req.query.token
-      const limit = req.query.limit
+      const { token, limit, offset } = req.query
       const expression = req.body
 
       try {
@@ -50,7 +51,7 @@ async function routes(server, { Core }) {
         throw e
       }
 
-      const results = Core.FTS.query(namespace, expression, { buckets, limit })
+      const results = Core.FTS.query(namespace, expression, { buckets, limit, offset })
       const accept = req.accepts().type([
         'application/json'
       , 'application/x-ndjson'

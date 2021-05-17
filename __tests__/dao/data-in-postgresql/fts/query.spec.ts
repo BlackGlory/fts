@@ -19,6 +19,7 @@ describe(`
   , options: {
       buckets?: string[]
       limit?: number
+      offset?: number
     }
   ): AsyncIterable<string> {
 `, () => {

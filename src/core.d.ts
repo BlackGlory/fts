@@ -71,8 +71,9 @@ interface ICore {
       namespace: string
     , expression: IQueryExpression
     , options: {
-        limit?: number
         buckets?: string[]
+        limit?: number
+        offset?: number
       }
     ): AsyncIterable<IQueryResult>
 
