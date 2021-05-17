@@ -32,13 +32,6 @@ FTS现阶段在更新词典时必须通过HTTP API手动刷新整个倒排索引
 理论上可以用WebSocket降低通信成本, 但目前还没有计划实现.
 
 *** 搜索
-**** 不支持排序
-支持对全文搜索的结果排序是一个难题:
-- 查询的构建是动态的, 排序查询结果是一项无法通过索引加速的I/O密集型操作, 在记录数较多的场合效率非常低下.
-- 在不同的场景下有多种不同的排序方法, 如需支持排序, 则"如何设计配置项"会成为决策层面的难题.
-
-由于上述原因, FTS无法支持排序.
-
 **** 查询语言
 FTS提供的查询语言是一种AST结构的JSON数组.
 
@@ -114,6 +107,15 @@ JSON:
 #+BEGIN_SRC json
 [4, "a"]
 #+END_SRC
+
+**** 基本排序
+排序全文搜索的结果存在以下难点:
+- 与全文搜索有关的排序方法全是无法通过索引加速的I/O密集型操作, 在记录数较多的时候排序性能非常差.
+- 排序方法有很多种, 不同后端支持的排序方法经常不一致.
+- 在仿REST接口的HTTP API上设计出一种与排序有关的配置项十分困难.
+
+由于上述原因, FTS只使用了最基本的基于namespace, bucket, object字段的排序(以稳定查询结果的顺序),
+而没有使用与全文搜索有关的排序方法.
 
 ** Install
 *** 配置
@@ -281,8 +283,7 @@ Array<{
 
 querystring:
 - =limit= integer, 限制返回的查询结果数量.
-
-查询结果本身不是稳定的, 相同的查询可能得到不同的结果.
+- =offset= integer, 设置查询结果的偏移量.
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
@@ -319,8 +320,7 @@ Array<{
 
 querystring:
 - =limit= integer, 限制返回的查询结果数量.
-
-查询结果本身不是稳定的, 相同的查询可能得到不同的结果.
+- =offset= integer, 设置查询结果的偏移量.
 
 此操作支持返回[[https://github.com/ndjson/ndjson-spec][ndjson]]格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
@@ -389,7 +389,7 @@ await fetch(`http://localhost:8080/fts/${namespace}/objects/${id}`, {
 }
 #+END_SRC
 
-**** get bucket stats 
+**** get bucket stats
 =GET /fts/<namespace>/buckets/<bucket>/stats=
 
 返回统计信息.
@@ -428,7 +428,7 @@ await fetch('http://localhost:8080/fts').then(res => res.json())
 
 此操作支持返回ndjson格式的响应, 需要 =Accept: application/x-ndjson= 请求头.
 
-***** Example 
+***** Example
 ****** curl
 #+BEGIN_SRC sh
 curl 'http://localhost:8080/fts/$namespace/buckets'
