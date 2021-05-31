@@ -11,6 +11,8 @@ export function convertExpressionToTsquery(
 
   if (isWordExpression(exp)) {
     const num = collector.next(exp)
+    // 同时使用english和simple是为了应对前缀查询时的边缘情况,
+    // 如果不需要前缀查询, 则可以省去simple部分
     return '('
          + `to_tsquery('english', $(${prefix}${num})${postfix})`
          + ' || '
