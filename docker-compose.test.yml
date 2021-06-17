@@ -3,6 +3,7 @@ version: '3.8'
 services:
   test:
     build:
+      dockerfile: Dockerfile.test
       context: .
       args:
         - 'HTTP_PROXY'
@@ -19,6 +20,7 @@ services:
 
   coverage:
     build:
+      dockerfile: Dockerfile.test
       context: .
       args:
         - 'HTTP_PROXY'
