@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/BlackGlory/fts/compare/v0.2.0...v0.2.1) (2021-06-21)
+
+
+### Features
+
+* add /health ([14c80a6](https://github.com/BlackGlory/fts/commit/14c80a671c54800182364ca0e9062433fa37a6c9))
+* order by relevance ([686b59b](https://github.com/BlackGlory/fts/commit/686b59b10a699a48804f73230d9a849edac3f68f))
+
+
+### Bug Fixes
+
+* docker build ([d7205b8](https://github.com/BlackGlory/fts/commit/d7205b8bf06d7a2e676eccba22cbe3581089b7e9))
+
 ## [0.2.0](https://github.com/BlackGlory/fts/compare/v0.1.0...v0.2.0) (2021-05-17)
 
 
