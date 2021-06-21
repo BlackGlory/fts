@@ -101,7 +101,7 @@ describe(`
     })
   })
 
-  describe('word expression', () => {
+  describe('term expression', () => {
     describe('not matched', () => {
       it('return AsyncIterable', async () => {
         const namespace = 'namespace'

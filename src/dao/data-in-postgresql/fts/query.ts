@@ -39,7 +39,8 @@ export async function* query(
        WHERE vector @@ ${tsquery}
          AND namespace = $(namespace)
       ${buckets && 'AND bucket IN ($(buckets:list))'}
-       ORDER BY namespace
+       ORDER BY ts_rank(vector, ${tsquery}) DESC
+              , namespace
               , bucket
               , id
       ${limit && 'LIMIT $(limit)'}
