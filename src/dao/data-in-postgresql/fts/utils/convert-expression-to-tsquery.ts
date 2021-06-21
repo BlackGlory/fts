@@ -9,7 +9,7 @@ export function convertExpressionToTsquery(
 ): string {
   const { prefix = '', postfix = '' } = options
 
-  if (isWordExpression(exp)) {
+  if (isTermExpression(exp)) {
     const num = collector.next(exp)
     // 同时使用english和simple是为了应对前缀查询时的边缘情况,
     // 如果不需要前缀查询, 则可以省去simple部分
@@ -60,7 +60,7 @@ export function convertExpressionToTsquery(
 }
 
 function isExpression(exp: unknown): exp is IQueryExpression {
-  return isWordExpression(exp)
+  return isTermExpression(exp)
       || isPhraseExpression(exp)
       || isPrefixExpression(exp)
       || isAndExpression(exp)
@@ -68,7 +68,7 @@ function isExpression(exp: unknown): exp is IQueryExpression {
       || isNotExpression(exp)
 }
 
-function isWordExpression(exp: unknown): exp is IWordExpression {
+function isTermExpression(exp: unknown): exp is ITermExpression {
   return isString(exp)
 }
 

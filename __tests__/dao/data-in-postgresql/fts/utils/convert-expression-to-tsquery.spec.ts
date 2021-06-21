@@ -5,7 +5,7 @@ import { SortedValueCollector }
 import { QueryKeyword } from '@src/query-keyword'
 
 describe('convertExpressionToTsquery(exp: Expression): string', () => {
-  test('WordExpression', () => {
+  test('TermExpression', () => {
     const collector = new SortedValueCollector()
 
     const result = convertExpressionToTsquery('string', collector)

@@ -18,14 +18,14 @@ interface IQueryResult {
 }
 
 type IQueryExpression =
-| IWordExpression
+| ITermExpression
 | IPhraseExpression
 | IPrefixExpression
 | IAndExpression
 | IOrExpression
 | INotExpression
 
-type IWordExpression = string
+type ITermExpression = string
 type IPhraseExpression = [
   import('./query-keyword').QueryKeyword.Phrase
 , ...IQueryExpression[]
