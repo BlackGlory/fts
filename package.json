@@ -86,7 +86,7 @@
     "bluebird": "^3.7.2",
     "dotenv": "^10.0.0",
     "extra-filesystem": "^0.3.4",
-    "extra-generator": "^0.2.7",
+    "extra-generator": "^0.2.8",
     "extra-sql-builder": "^0.2.8",
     "extra-tags": "^0.2.2",
     "fastify": "^3.19.1",
