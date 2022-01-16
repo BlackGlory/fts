@@ -171,5 +171,5 @@ function toInteger(val: string | number | undefined ): number | undefined {
 }
 
 function shouldBePositive(val: number) {
-  assert(val > 0)
+  assert(val > 0, 'should be positive')
 }
