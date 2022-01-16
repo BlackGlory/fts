@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/BlackGlory/fts/compare/v0.2.5...v0.2.6) (2022-01-16)
+
+
+### Features
+
+* add accept-version support ([e10c115](https://github.com/BlackGlory/fts/commit/e10c115c04ff26aaf7e84095e896190cfa99f5bc))
+* add cache-control header ([0903d63](https://github.com/BlackGlory/fts/commit/0903d6366caec4725b70bf604dfd4daf151ead8b))
+
+
+### Bug Fixes
+
+* **docker:** build ([f16be18](https://github.com/BlackGlory/fts/commit/f16be1883cf16875c332386e2a104c93589beaaf))
+* **docker:** healthcheck ([11bb425](https://github.com/BlackGlory/fts/commit/11bb425a688fb4e135e4bfb1f2da86b807c8a1c5))
+
 ### [0.2.5](https://github.com/BlackGlory/fts/compare/v0.2.4...v0.2.5) (2021-10-14)
 
 ### [0.2.4](https://github.com/BlackGlory/fts/compare/v0.2.3...v0.2.4) (2021-07-13)
