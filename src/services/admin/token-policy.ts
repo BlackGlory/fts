@@ -30,24 +30,9 @@ async function routes(server, { Core }) {
         params: { namespace: namespaceSchema }
       , response: {
           200: {
-            writeTokenRequired: {
-              anyOf: [
-                { type: 'boolean' }
-              , { type: 'null' }
-              ]
-            }
-          , queryTokenRequired: {
-              anyOf: [
-                { type: 'boolean' }
-              , { type: 'null' }
-              ]
-            }
-          , deleteTokenRequired: {
-              anyOf: [
-                { type: 'boolean' }
-              , { type: 'null' }
-              ]
-            }
+            writeTokenRequired: { type: 'boolean', nullable: true }
+          , queryTokenRequired: { type: 'boolean', nullable: true }
+          , deleteTokenRequired: { type: 'boolean', nullable: true }
           }
         }
       }
