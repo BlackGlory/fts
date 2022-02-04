@@ -51,7 +51,6 @@
     "@types/jest-json-schema": "^6.1.0",
     "@types/node": "16",
     "@types/pg": "^8.6.4",
-    "@types/semver": "^7.3.9",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "cross-env": "^7.0.3",
@@ -88,6 +87,7 @@
     "dotenv": "^16.0.0",
     "extra-filesystem": "^0.4.1",
     "extra-generator": "^0.2.15",
+    "extra-semver": "^0.1.0",
     "extra-sql-builder": "^0.2.9",
     "extra-tags": "^0.2.4",
     "fastify": "^3.27.1",
@@ -101,7 +101,6 @@
     "pg": "^8.7.1",
     "pg-promise": "^10.11.1",
     "prom-client": "^14.0.1",
-    "semver": "^7.3.5",
     "value-getter": "^0.2.2"
   }
 }
