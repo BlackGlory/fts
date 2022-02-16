@@ -13,7 +13,7 @@ CREATE TABLE fts_object (
 CREATE INDEX idx_fts_object_vector
     ON fts_object
  USING GIN (vector)
-  WITH (fastupdate = OFF);
+  WITH (fastupdate = ON);
 
 -- getNamespaceStats
 CREATE INDEX idx_namespace
