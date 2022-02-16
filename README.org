@@ -174,7 +174,7 @@ services:
       - '8080:8080'
 
   postgres:
-    image: 'postgres:13'
+    image: 'postgres:14'
     environment:
       - 'POSTGRES_PASSWORD=password'
     volumes:
@@ -213,7 +213,7 @@ services:
       - '8080:8080'
 
   postgres:
-    image: 'postgres:13'
+    image: 'postgres:14'
     environment:
       - 'POSTGRES_PASSWORD=password'
     volumes:

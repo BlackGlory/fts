@@ -36,7 +36,7 @@ services:
       - 'FTS_POSTGRES_NAME=test'
 
   postgres:
-    image: 'postgres:13'
+    image: 'postgres:14'
     environment:
       - 'POSTGRES_PASSWORD=password'
       - 'POSTGRES_INITDB_ARGS=--locale=C.UTF-8'
