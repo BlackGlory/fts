@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/BlackGlory/fts/compare/v0.2.6...v0.3.0) (2022-02-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires manual data migration.
+
+* upgrade @blackglory/pg-migrations ([d7f99b6](https://github.com/BlackGlory/fts/commit/d7f99b6ac2f3c73b47dcad08e8127e944fcdf5c5))
+
 ### [0.2.6](https://github.com/BlackGlory/fts/compare/v0.2.5...v0.2.6) (2022-01-16)
 
 
