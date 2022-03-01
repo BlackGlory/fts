@@ -1,9 +1,7 @@
 import { db } from '../database'
 import { sql } from 'extra-sql-builder'
-import { convertExpressionToTsquery, }
-  from './utils/convert-expression-to-tsquery'
-import { convertArrayToObject } from './utils/convert-array-to-object'
-import { SortedValueCollector } from './utils/sorted-value-collector'
+import { convertExpressionToTsquery } from './utils/convert-expression-to-tsquery'
+import { ValueCollector } from 'value-collector'
 
 export async function* query(
   namespace: string
@@ -15,9 +13,8 @@ export async function* query(
   }
 ): AsyncIterable<IQueryResult> {
   const { buckets, limit, offset } = options
-  const collector = new SortedValueCollector()
-  const tsquery = convertExpressionToTsquery(expression, collector, { prefix: 'param' })
-  const queryParameters = convertArrayToObject(collector.values, { prefix: 'param' })
+  const collector = new ValueCollector<string>('param')
+  const tsquery = convertExpressionToTsquery(expression, collector)
 
   // 经测试, tsquery的结果会在查询中被重用.
   // 因此即使用 WITH 子句(CTE)单独将结果保存到临时表, 也无法缩短查询时间.
@@ -46,7 +43,7 @@ export async function* query(
       ${limit && 'LIMIT $(limit)'}
       ${offset && 'OFFSET $(offset)'}
     `
-  , { namespace, buckets, limit, ...queryParameters }
+  , { namespace, buckets, limit, ...collector.toRecord() }
   )
 
   yield* rows.map(x => ({

@@ -1,58 +1,55 @@
 import { isString, isArray } from '@blackglory/types'
 import { QueryKeyword } from '@src/query-keyword'
-import { SortedValueCollector } from './sorted-value-collector'
+import { ValueCollector } from 'value-collector'
 
 export function convertExpressionToTsquery(
   exp: IQueryExpression
-, collector: SortedValueCollector
-, options: { prefix?: string; postfix?: string } = {}
+, collector: ValueCollector<string>
 ): string {
-  const { prefix = '', postfix = '' } = options
-
   if (isTermExpression(exp)) {
-    const num = collector.next(exp)
+    const id = collector.add(exp)
     // 同时使用english和simple是为了应对前缀查询时的边缘情况,
     // 如果不需要前缀查询, 则可以省去simple部分
     return '('
-         + `to_tsquery('english', $(${prefix}${num})${postfix})`
+         + `to_tsquery('english', $(${id}))`
          + ' || '
-         + `to_tsquery('simple', $(${prefix}${num}${postfix}))`
+         + `to_tsquery('simple', $(${id}))`
          + ')'
   }
 
   if (isPhraseExpression(exp)) {
     const result = (exp.slice(1) as IQueryExpression[])
-      .map(x => convertExpressionToTsquery(x, collector, options))
+      .map(x => convertExpressionToTsquery(x, collector))
       .join(' <-> ')
 
     return '(' + result + ')'
   }
 
   if (isPrefixExpression(exp)) {
-    const num = collector.next(exp[1])
-    return `CONCAT($(${prefix}${num}${postfix}), ':*')::tsquery`
+    const id = collector.add(exp[1])
+    return `CONCAT($(${id}), ':*')::tsquery`
   }
 
   if (isAndExpression(exp)) {
     return '('
-         + convertExpressionToTsquery(exp[0], collector, options)
+         + convertExpressionToTsquery(exp[0], collector)
          + ' && '
-         + convertExpressionToTsquery(exp[2], collector, options)
+         + convertExpressionToTsquery(exp[2], collector)
          + ')'
   }
 
   if (isOrExpression(exp)) {
     return '('
-         + convertExpressionToTsquery(exp[0], collector, options)
+         + convertExpressionToTsquery(exp[0], collector)
          + ' || '
-         + convertExpressionToTsquery(exp[2], collector, options)
+         + convertExpressionToTsquery(exp[2], collector)
          + ')'
   }
 
   if (isNotExpression(exp)) {
     return '('
          + '!! '
-         + convertExpressionToTsquery(exp[1], collector, options)
+         + convertExpressionToTsquery(exp[1], collector)
          + ')'
   }
 

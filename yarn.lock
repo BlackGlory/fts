@@ -7540,6 +7540,13 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
+value-collector@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/value-collector/-/value-collector-0.1.0.tgz#7953d064bb24a16b38c3e01789696029bbfd5c8d"
+  integrity sha512-gbt2BebXFy8Tgzwm7aAFvlRBbBRlI8QTJ1XcGyYEV+ugzJJp0zCi8opS81Jcb96LuN5uM0LkrSBLIQFt6uNjyw==
+  dependencies:
+    lodash.frompairs "^4.0.1"
+
 value-getter@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/value-getter/-/value-getter-0.2.2.tgz#76c1a5e89d7d1e3ef8b7cb0d5e1b78c8081643ce"
