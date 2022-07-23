@@ -2,7 +2,6 @@
   "private": true,
   "name": "fts",
   "version": "0.3.1",
-  "main": "lib/index.js",
   "repository": "git@github.com:BlackGlory/fts.git",
   "author": "BlackGlory <woshenmedoubuzhidao@blackglory.me>",
   "license": "MIT",
@@ -17,12 +16,13 @@
     "test:coverage": "jest --runInBand --coverage --config jest.config.js",
     "dev": "nodemon",
     "dev:http2": "cross-env FTS_HTTP2=true nodemon",
-    "clean": "rimraf lib",
+    "clean": "rimraf lib dist",
     "build": "run-s build:*",
     "build:compile": "tsc --project tsconfig.build.json",
     "build:patch": "tscpaths --project tsconfig.build.json --src ./src --out ./lib",
-    "start": "node lib/index.js",
-    "start:http2": "cross-env FTS_HTTP2=true node lib/index.js",
+    "bundle": "webpack --stats-error-details",
+    "start": "node dist/index.cjs",
+    "start:http2": "cross-env FTS_HTTP2=true node node/index.js",
     "docker:build": "docker build --tag fts .",
     "docker:test": "run-s docker:test:clean docker:test:build docker:test:run docker:test:clean",
     "docker:coverage": "run-s docker:test:clea docker:test:build docker:test:coverage docker:test:clean",
@@ -34,7 +34,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "run-s lint build docker:test",
+      "pre-commit": "run-s clean lint build docker:test bundle",
       "commit-msg": "commitlint --env HUSKY_GIT_PARAMS"
     }
   },
@@ -73,6 +73,8 @@
     "tsconfig-paths": "^4.0.0",
     "tscpaths": "^0.0.9",
     "typescript": "^4.6.2",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
     "yarn-deduplicate": "^5.0.0"
   },
   "dependencies": {
