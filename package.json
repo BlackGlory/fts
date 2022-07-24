@@ -24,11 +24,12 @@
     "start": "node dist/index.cjs",
     "start:http2": "cross-env FTS_HTTP2=true node node/index.js",
     "docker:build": "docker build --tag fts .",
-    "docker:test": "run-s docker:test:clean docker:test:build docker:test:run docker:test:clean",
+    "docker:test": "run-s docker:test:clean docker:test:build docker:test:run docker:test:smoke docker:test:clean",
     "docker:coverage": "run-s docker:test:clea docker:test:build docker:test:coverage docker:test:clean",
     "docker:test:build": "docker-compose --file docker-compose.test.yml build",
     "docker:test:run": "docker-compose --file docker-compose.test.yml run --rm test",
     "docker:test:coverage": "docker-compose --file docker-compose.test.yml run --rm coverage",
+    "docker:test:smoke": "docker-compose --file docker-compose.test.yml run --rm smoke",
     "docker:test:clean": "docker-compose --file docker-compose.test.yml down",
     "release": "standard-version"
   },
