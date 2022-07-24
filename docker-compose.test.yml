@@ -10,7 +10,7 @@ services:
         - 'HTTPS_PROXY'
     depends_on:
       - postgres
-    command: 'test'
+    command: 'run-s test smoke'
     environment:
       - 'FTS_POSTGRES_HOST=postgres'
       - 'FTS_POSTGRES_PORT=5432'
@@ -29,24 +29,6 @@ services:
       - postgres
     command: 'test:coverage'
     environment:
-      - 'FTS_POSTGRES_HOST=postgres'
-      - 'FTS_POSTGRES_PORT=5432'
-      - 'FTS_POSTGRES_USERNAME=postgres'
-      - 'FTS_POSTGRES_PASSWORD=password'
-      - 'FTS_POSTGRES_NAME=test'
-
-  smoke:
-    build:
-      dockerfile: Dockerfile.test
-      context: .
-      args:
-        - 'HTTP_PROXY'
-        - 'HTTPS_PROXY'
-    depends_on:
-      - postgres
-    command: 'smoke'
-    environment:
-      - 'CI=true'
       - 'FTS_POSTGRES_HOST=postgres'
       - 'FTS_POSTGRES_PORT=5432'
       - 'FTS_POSTGRES_USERNAME=postgres'
