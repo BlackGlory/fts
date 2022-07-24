@@ -44,7 +44,7 @@ services:
         - 'HTTPS_PROXY'
     depends_on:
       - postgres
-    command: 'start'
+    command: 'smoke'
     environment:
       - 'CI=true'
       - 'FTS_POSTGRES_HOST=postgres'
