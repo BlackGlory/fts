@@ -131,6 +131,7 @@ git clone https://github.com/BlackGlory/fts
 cd log
 yarn install
 yarn build
+yarn bundle
 yarn --silent start
 #+END_SRC
 
