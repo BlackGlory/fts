@@ -3,16 +3,11 @@ import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database'
 import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils'
 import { buildServer } from './server'
 import { PORT, HOST, NODE_ENV, NodeEnv } from '@env'
-
-process.on('exit', () => {
-  ConfigInSQLite3.closeDatabase()
-})
-process.on('SIGHUP', () => process.exit(128 + 1))
-process.on('SIGINT', () => process.exit(128 + 2))
-process.on('SIGTERM', () => process.exit(128 + 15))
+import { youDied } from 'you-died'
 
 go(async () => {
   ConfigInSQLite3.openDatabase()
+  youDied(() => ConfigInSQLite3.closeDatabase())
   ConfigInSQLite3.prepareDatabase()
 
   await DataInPostgreSQL.ensureDatabase()

@@ -106,6 +106,7 @@
     "pg-promise": "^10.11.1",
     "prom-client": "^14.0.1",
     "value-collector": "^0.1.2",
-    "value-getter": "^0.2.4"
+    "value-getter": "^0.2.4",
+    "you-died": "^0.4.2"
   }
 }
