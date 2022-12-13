@@ -1,10 +1,10 @@
 import { isString, isArray } from '@blackglory/types'
 import { QueryKeyword } from '@src/query-keyword'
-import { ValueCollector } from 'value-collector'
+import { ParameterCollector } from 'extra-sql-builder'
 
 export function convertExpressionToTsquery(
   exp: IQueryExpression
-, collector: ValueCollector<string>
+, collector: ParameterCollector<string>
 ): string {
   if (isTermExpression(exp)) {
     const id = collector.add(exp)

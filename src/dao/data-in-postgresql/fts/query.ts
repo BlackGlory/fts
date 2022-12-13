@@ -1,7 +1,6 @@
 import { db } from '../database'
-import { sql } from 'extra-sql-builder'
+import { sql, ParameterCollector } from 'extra-sql-builder'
 import { convertExpressionToTsquery } from './utils/convert-expression-to-tsquery'
-import { ValueCollector } from 'value-collector'
 
 export async function* query(
   namespace: string
@@ -13,7 +12,7 @@ export async function* query(
   }
 ): AsyncIterable<IQueryResult> {
   const { buckets, limit, offset } = options
-  const collector = new ValueCollector<string>('param')
+  const collector = new ParameterCollector<string>('param')
   const tsquery = convertExpressionToTsquery(expression, collector)
 
   // 经测试, tsquery的结果会在查询中被重用.

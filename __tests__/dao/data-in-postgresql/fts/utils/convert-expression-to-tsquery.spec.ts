@@ -1,10 +1,10 @@
 import { convertExpressionToTsquery } from '@dao/data-in-postgresql/fts/utils/convert-expression-to-tsquery'
-import { ValueCollector } from 'value-collector'
+import { ParameterCollector } from 'extra-sql-builder'
 import { QueryKeyword } from '@src/query-keyword'
 
 describe('convertExpressionToTsquery(exp: Expression): string', () => {
   test('TermExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery('string', collector)
 
@@ -13,7 +13,7 @@ describe('convertExpressionToTsquery(exp: Expression): string', () => {
   })
 
   test('PhraseExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery([QueryKeyword.Phrase, 'A', 'B'], collector)
 
@@ -28,7 +28,7 @@ describe('convertExpressionToTsquery(exp: Expression): string', () => {
   })
 
   test('PrefixExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery([QueryKeyword.Prefix, 'A'], collector)
 
@@ -37,7 +37,7 @@ describe('convertExpressionToTsquery(exp: Expression): string', () => {
   })
 
   test('AndExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery(['A', QueryKeyword.And, 'B'], collector)
 
@@ -52,7 +52,7 @@ describe('convertExpressionToTsquery(exp: Expression): string', () => {
   })
 
   test('OrExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery(['A', QueryKeyword.Or, 'B'], collector)
 
@@ -67,7 +67,7 @@ describe('convertExpressionToTsquery(exp: Expression): string', () => {
   })
 
   test('NotExpression', () => {
-    const collector = new ValueCollector<string>('param')
+    const collector = new ParameterCollector<string>('param')
 
     const result = convertExpressionToTsquery([QueryKeyword.Not, 'A'], collector)
 
