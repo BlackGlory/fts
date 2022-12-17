@@ -3,7 +3,9 @@ import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils'
 import { resetCache } from '@env/cache'
 import { buildServer } from '@src/server'
 import { db } from '@dao/data-in-postgresql/database'
+import Ajv from 'ajv'
 
+const ajv = new Ajv()
 let server: ReturnType<typeof buildServer>
 let address: string
 
@@ -67,4 +69,10 @@ export function resetEnvironment() {
 
   // reset memoize
   resetCache()
+}
+
+export function expectMatchSchema(data: unknown, schema: object): void {
+  if (!ajv.validate(schema, data)) {
+    throw new Error(ajv.errorsText())
+  }
 }

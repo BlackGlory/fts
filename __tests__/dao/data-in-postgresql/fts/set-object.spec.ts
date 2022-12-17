@@ -1,8 +1,6 @@
 import * as DAO from '@dao/data-in-postgresql/fts/set-object'
 import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
 import { getRawObject, toVector } from './utils'
-import '@blackglory/jest-matchers'
-import 'jest-extended'
 
 jest.mock('@dao/config-in-sqlite3/database')
 

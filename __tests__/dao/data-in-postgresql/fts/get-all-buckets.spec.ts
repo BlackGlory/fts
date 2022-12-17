@@ -2,7 +2,6 @@ import * as DAO from '@dao/data-in-postgresql/fts/get-all-buckets'
 import { toArrayAsync } from 'iterable-operator'
 import { setRawObject } from './utils'
 import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
-import '@blackglory/jest-matchers'
 
 jest.mock('@dao/config-in-sqlite3/database')
 
@@ -27,7 +26,6 @@ describe('getAllBuckets(namespace: string): AsyncIterable<string>', () => {
       const iter = DAO.getAllBuckets(namespace2)
       const result = await toArrayAsync(iter)
 
-      expect(iter).toBeAsyncIterable()
       expect(result).toStrictEqual([])
     })
   })
@@ -47,7 +45,6 @@ describe('getAllBuckets(namespace: string): AsyncIterable<string>', () => {
       const iter = DAO.getAllBuckets(namespace)
       const result = await toArrayAsync(iter)
 
-      expect(iter).toBeAsyncIterable()
       expect(result).toStrictEqual([bucket])
     })
   })

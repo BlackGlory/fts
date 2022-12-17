@@ -1,8 +1,6 @@
 import * as DAO from '@dao/data-in-postgresql/fts/delete-all-objects-by-bucket'
 import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
 import { hasRawObject, setRawObject } from './utils'
-import '@blackglory/jest-matchers'
-import 'jest-extended'
 
 jest.mock('@dao/config-in-sqlite3/database')
 
@@ -29,7 +27,7 @@ describe(`
       const result = await DAO.deleteAllObjectsByBucket(namespace, bucket1)
 
       expect(result).toBeUndefined()
-      expect(await hasRawObject(namespace, bucket2, id)).toBeTrue()
+      expect(await hasRawObject(namespace, bucket2, id)).toBe(true)
     })
   })
 
@@ -55,8 +53,8 @@ describe(`
       const result = await DAO.deleteAllObjectsByBucket(namespace, bucket1)
 
       expect(result).toBeUndefined()
-      expect(await hasRawObject(namespace, bucket1, id)).toBeFalse()
-      expect(await hasRawObject(namespace, bucket2, id)).toBeTrue()
+      expect(await hasRawObject(namespace, bucket1, id)).toBe(false)
+      expect(await hasRawObject(namespace, bucket2, id)).toBe(true)
     })
   })
 })

@@ -1,5 +1,4 @@
-import { startService, stopService, getAddress, closeAllConnections } from '@test/utils'
-import { matchers } from 'jest-json-schema'
+import { expectMatchSchema, startService, stopService, getAddress, closeAllConnections } from '@test/utils'
 import { prepareFTSs } from './utils'
 import { fetch } from 'extra-fetch'
 import { post } from 'extra-request'
@@ -7,7 +6,6 @@ import { url, pathname, json } from 'extra-request/lib/es2018/transformers'
 import { toJSON } from 'extra-response'
 
 jest.mock('@dao/config-in-sqlite3/database')
-expect.extend(matchers)
 
 beforeEach(startService)
 afterEach(stopService)
@@ -28,7 +26,7 @@ describe('no access control', () => {
 
     expect(res.status).toBe(200)
     expect(result.length).toBeGreaterThanOrEqual(1)
-    expect(result).toMatchSchema({
+    expectMatchSchema(result, {
       type: 'array'
     , items: {
         type: 'object'

@@ -3,8 +3,6 @@ import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/
 import { setRawObject, toVector } from './utils'
 import { toArrayAsync } from 'iterable-operator'
 import { QueryKeyword } from '@src/query-keyword'
-import '@blackglory/jest-matchers'
-import 'jest-extended'
 
 jest.mock('@dao/config-in-sqlite3/database')
 
@@ -35,10 +33,9 @@ describe(`
       , vector: await toVector(['one', 'two', 'three'])
       })
 
-      const iter = await DAO.query(namespace2, 'three', {})
+      const iter = DAO.query(namespace2, 'three', {})
       const result = await toArrayAsync(iter)
 
-      expect(iter).toBeAsyncIterable()
       expect(result).toStrictEqual([])
     })
   })
@@ -62,10 +59,9 @@ describe(`
       , vector: await toVector(['one', 'two', 'three'])
       })
 
-      const iter = await DAO.query(namespace, 'three', { limit: 1 })
+      const iter = DAO.query(namespace, 'three', { limit: 1 })
       const result = await toArrayAsync(iter)
 
-      expect(iter).toBeAsyncIterable()
       expect(result).toStrictEqual([
         { bucket, id: id1 }
       ])
@@ -91,10 +87,9 @@ describe(`
       , vector: await toVector(['one', 'two', 'three'])
       })
 
-      const iter = await DAO.query(namespace, 'three', { buckets: [bucket1] })
+      const iter = DAO.query(namespace, 'three', { buckets: [bucket1] })
       const result = await toArrayAsync(iter)
 
-      expect(iter).toBeAsyncIterable()
       expect(result).toStrictEqual([
         { bucket: bucket1, id }
       ])
@@ -114,10 +109,9 @@ describe(`
         , vector: await toVector(['one', 'two'])
         })
 
-        const iter = await DAO.query(namespace, 'three', {})
+        const iter = DAO.query(namespace, 'three', {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -134,10 +128,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, 'three', {})
+        const iter = DAO.query(namespace, 'three', {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])
@@ -158,14 +151,13 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(
+        const iter = DAO.query(
           namespace
         , [QueryKeyword.Phrase, 'one', 'three']
         , {}
         )
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -182,14 +174,13 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(
+        const iter = DAO.query(
           namespace
         , [QueryKeyword.Phrase, 'two', 'three']
         , {}
         )
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])
@@ -210,10 +201,9 @@ describe(`
         , vector: await toVector(['one'])
         })
 
-        const iter = await DAO.query(namespace, [QueryKeyword.Prefix, 't'], {})
+        const iter = DAO.query(namespace, [QueryKeyword.Prefix, 't'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -230,10 +220,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, [QueryKeyword.Prefix, 't'], {})
+        const iter = DAO.query(namespace, [QueryKeyword.Prefix, 't'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])
@@ -254,10 +243,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, ['one', QueryKeyword.And, 'four'], {})
+        const iter = DAO.query(namespace, ['one', QueryKeyword.And, 'four'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -274,14 +262,13 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(
+        const iter = DAO.query(
           namespace
         , ['one', QueryKeyword.And, 'three']
         , {}
         )
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])
@@ -302,10 +289,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, ['four', QueryKeyword.Or, 'five'], {})
+        const iter = DAO.query(namespace, ['four', QueryKeyword.Or, 'five'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -322,10 +308,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, ['one', QueryKeyword.Or, 'four'], {})
+        const iter = DAO.query(namespace, ['one', QueryKeyword.Or, 'four'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])
@@ -346,10 +331,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, [QueryKeyword.Not, 'one'], {})
+        const iter = DAO.query(namespace, [QueryKeyword.Not, 'one'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([])
       })
     })
@@ -366,10 +350,9 @@ describe(`
         , vector: await toVector(['one', 'two', 'three'])
         })
 
-        const iter = await DAO.query(namespace, [QueryKeyword.Not, 'four'], {})
+        const iter = DAO.query(namespace, [QueryKeyword.Not, 'four'], {})
         const result = await toArrayAsync(iter)
 
-        expect(iter).toBeAsyncIterable()
         expect(result).toStrictEqual([
           { bucket, id }
         ])

@@ -1,7 +1,6 @@
 import * as DAO from '@dao/config-in-sqlite3/access-control/token-policy'
 import { initializeDatabases, clearDatabases } from '@test/utils'
 import { getRawTokenPolicy, hasRawTokenPolicy, setRawTokenPolicy } from './utils'
-import 'jest-extended'
 
 jest.mock('@dao/config-in-sqlite3/database')
 
@@ -101,7 +100,7 @@ describe('TokenPolicy', () => {
         const result = DAO.unsetWriteTokenRequired(namespace)
 
         expect(result).toBeUndefined()
-        expect(hasRawTokenPolicy(namespace)).toBeFalse()
+        expect(hasRawTokenPolicy(namespace)).toBe(false)
       })
     })
   })
@@ -146,7 +145,7 @@ describe('TokenPolicy', () => {
         const result = DAO.unsetQueryTokenRequired(namespace)
 
         expect(result).toBeUndefined()
-        expect(hasRawTokenPolicy(namespace)).toBeFalse()
+        expect(hasRawTokenPolicy(namespace)).toBe(false)
       })
     })
   })
@@ -191,7 +190,7 @@ describe('TokenPolicy', () => {
         const result = DAO.unsetDeleteTokenRequired(namespace)
 
         expect(result).toBeUndefined()
-        expect(hasRawTokenPolicy(namespace)).toBeFalse()
+        expect(hasRawTokenPolicy(namespace)).toBe(false)
       })
     })
   })
