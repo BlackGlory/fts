@@ -1,6 +1,7 @@
 import { Client } from 'pg'
 import { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } from '@env'
-import { readMigrations } from 'migrations-file'
+import { findMigrationFilenames, readMigrationFile } from 'migration-files'
+import { map } from 'extra-promise'
 import { path as appRoot } from 'app-root-path'
 import * as path from 'path'
 import { migrate } from '@blackglory/pg-migrations'
@@ -17,7 +18,10 @@ export async function migrateDatabase(targetVersion?: number): Promise<void> {
   await client.connect()
   try {
     const migrationsPath = path.join(appRoot, 'migrations/data-in-postgresql')
-    const migrations = await readMigrations(migrationsPath)
+    const migrations = await map(
+      await findMigrationFilenames(migrationsPath)
+    , readMigrationFile
+    )
     await migrate(client, migrations, targetVersion)
   } finally {
     await client.end()
