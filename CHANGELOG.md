@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/BlackGlory/fts/compare/v0.3.4...v0.4.0) (2023-01-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* - The `Accept-Version` header is semver now.
+- Removed `/metrics`.
+- Removed HTTP2 support.
+
+* upgrade dependencies ([e138cf4](https://github.com/BlackGlory/fts/commit/e138cf4eeb0ba5c54c5ab651650d85bd8e999424))
+
 ### [0.3.4](https://github.com/BlackGlory/fts/compare/v0.3.3...v0.3.4) (2022-09-07)
 
 ### [0.3.3](https://github.com/BlackGlory/fts/compare/v0.3.2...v0.3.3) (2022-08-11)
