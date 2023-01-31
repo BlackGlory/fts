@@ -1,4 +1,4 @@
-import { db } from '@dao/data-in-postgresql/database'
+import { db } from '@dao/data-in-postgresql/database.js'
 
 interface IRawObject {
   namespace: string

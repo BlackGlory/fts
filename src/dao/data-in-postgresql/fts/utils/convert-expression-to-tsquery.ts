@@ -1,5 +1,5 @@
-import { isString, isArray } from '@blackglory/types'
-import { QueryKeyword } from '@src/query-keyword'
+import { isString, isArray } from '@blackglory/prelude'
+import { QueryKeyword } from '@src/query-keyword.js'
 import { ParameterCollector } from 'extra-sql-builder'
 
 export function convertExpressionToTsquery(

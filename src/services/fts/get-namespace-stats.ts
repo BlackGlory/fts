@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema } from '@src/schema'
+import { namespaceSchema } from '@src/schema.js'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -25,7 +25,7 @@ async function routes(server, { Core }) {
       const namespace = req.params.namespace
 
       const result = await Core.FTS.getNamespaceStats(namespace)
-      reply.send(result)
+      return reply.send(result)
     }
   )
 }

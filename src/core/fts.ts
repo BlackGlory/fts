@@ -1,4 +1,4 @@
-import { FTSDAO } from '@dao'
+import { FTSDAO } from '@dao/index.js'
 
 export function set(
   namespace: string

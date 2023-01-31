@@ -1,9 +1,7 @@
-import * as DAO from '@dao/data-in-postgresql/fts/get-all-namespaces'
+import * as DAO from '@dao/data-in-postgresql/fts/get-all-namespaces.js'
 import { toArrayAsync } from 'iterable-operator'
-import { setRawObject } from './utils'
-import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
-
-jest.mock('@dao/config-in-sqlite3/database')
+import { setRawObject } from './utils.js'
+import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils.js'
 
 beforeEach(initializeDatabases)
 afterEach(clearDatabases)

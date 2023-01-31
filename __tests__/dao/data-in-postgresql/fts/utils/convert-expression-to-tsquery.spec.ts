@@ -1,6 +1,6 @@
-import { convertExpressionToTsquery } from '@dao/data-in-postgresql/fts/utils/convert-expression-to-tsquery'
+import { convertExpressionToTsquery } from '@dao/data-in-postgresql/fts/utils/convert-expression-to-tsquery.js'
 import { ParameterCollector } from 'extra-sql-builder'
-import { QueryKeyword } from '@src/query-keyword'
+import { QueryKeyword } from '@src/query-keyword.js'
 
 describe('convertExpressionToTsquery(exp: Expression): string', () => {
   test('TermExpression', () => {

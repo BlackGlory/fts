@@ -1,4 +1,4 @@
-import { db } from '../database'
+import { db } from '../database.js'
 
 export async function* getAllNamespaces(): AsyncIterable<string> {
   const rows = await db.manyOrNone<{ namespace: string }>(`

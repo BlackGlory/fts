@@ -1,10 +1,11 @@
-import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database'
-import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils'
-import { resetCache } from '@env/cache'
-import { buildServer } from '@src/server'
-import { db } from '@dao/data-in-postgresql/database'
+import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database.js'
+import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils.js'
+import { resetCache } from '@env/cache.js'
+import { buildServer } from '@src/server.js'
+import { db } from '@dao/data-in-postgresql/database.js'
 import Ajv from 'ajv'
 
+// @ts-ignore
 const ajv = new Ajv()
 let server: ReturnType<typeof buildServer>
 let address: string
@@ -19,11 +20,10 @@ export async function startService() {
   await initializeDatabases()
 
   server = buildServer()
-  address = await server.listen(0)
+  address = await server.listen()
 }
 
 export async function stopService() {
-  server.metrics.clearRegister()
   await server.close()
 
   await clearDatabases()

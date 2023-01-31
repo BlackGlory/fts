@@ -1,10 +1,8 @@
-import * as DAO from '@dao/data-in-postgresql/fts/query'
-import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
-import { setRawObject, toVector } from './utils'
+import * as DAO from '@dao/data-in-postgresql/fts/query.js'
+import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils.js'
+import { setRawObject, toVector } from './utils.js'
 import { toArrayAsync } from 'iterable-operator'
-import { QueryKeyword } from '@src/query-keyword'
-
-jest.mock('@dao/config-in-sqlite3/database')
+import { QueryKeyword } from '@src/query-keyword.js'
 
 beforeEach(initializeDatabases)
 afterEach(clearDatabases)

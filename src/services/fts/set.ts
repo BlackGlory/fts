@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
 import { namespaceSchema, bucketSchema, tokenSchema, lexemesSchema, idSchema }
-  from '@src/schema'
-import { WRITE_PAYLOAD_LIMIT } from '@env'
+  from '@src/schema.js'
+import { WRITE_PAYLOAD_LIMIT } from '@env/index.js'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -47,7 +47,9 @@ async function routes(server, { Core }) {
       }
 
       await Core.FTS.set(namespace, bucket, id, lexemes)
-      reply.status(204).send()
+      return reply
+        .status(204)
+        .send()
     }
   )
 }

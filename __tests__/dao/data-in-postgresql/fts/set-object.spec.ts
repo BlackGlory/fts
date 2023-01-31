@@ -1,8 +1,6 @@
-import * as DAO from '@dao/data-in-postgresql/fts/set-object'
-import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
-import { getRawObject, toVector } from './utils'
-
-jest.mock('@dao/config-in-sqlite3/database')
+import * as DAO from '@dao/data-in-postgresql/fts/set-object.js'
+import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils.js'
+import { getRawObject, toVector } from './utils.js'
 
 beforeEach(initializeDatabases)
 afterEach(clearDatabases)

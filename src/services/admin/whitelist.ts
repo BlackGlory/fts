@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema } from '@src/schema'
+import { namespaceSchema } from '@src/schema.js'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -17,7 +17,7 @@ async function routes(server, { Core }) {
     }
   , async (req, reply) => {
       const result = await Core.Whitelist.getAll()
-      reply.send(result)
+      return reply.send(result)
     }
   )
 
@@ -34,7 +34,9 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       await Core.Whitelist.add(namespace)
-      reply.status(204).send()
+      return reply
+        .status(204)
+        .send()
     }
   )
 
@@ -51,7 +53,9 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       await Core.Whitelist.remove(namespace)
-      reply.status(204).send()
+      return reply
+        .status(204)
+        .send()
     }
   )
 }

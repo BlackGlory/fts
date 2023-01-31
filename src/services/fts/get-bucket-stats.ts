@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, bucketSchema } from '@src/schema'
+import { namespaceSchema, bucketSchema } from '@src/schema.js'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -29,7 +29,7 @@ async function routes(server, { Core }) {
       const { namespace, bucket } = req.params
 
       const result = await Core.FTS.getBucketStats(namespace, bucket)
-      reply.send(result)
+      return reply.send(result)
     }
   )
 }

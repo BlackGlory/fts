@@ -1,6 +1,6 @@
-import { db } from '../database'
+import { db } from '../database.js'
 import { sql, ParameterCollector } from 'extra-sql-builder'
-import { convertExpressionToTsquery } from './utils/convert-expression-to-tsquery'
+import { convertExpressionToTsquery } from './utils/convert-expression-to-tsquery.js'
 
 export async function* query(
   namespace: string

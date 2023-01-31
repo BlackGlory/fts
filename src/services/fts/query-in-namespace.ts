@@ -1,8 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, tokenSchema } from '@src/schema'
+import { namespaceSchema, tokenSchema } from '@src/schema.js'
 import { Readable } from 'stream'
 import { stringifyJSONStreamAsync, stringifyNDJSONStreamAsync } from 'extra-generator'
-import accepts from 'fastify-accepts'
+import accepts from '@fastify/accepts'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -15,7 +15,7 @@ async function routes(server, { Core }) {
       limit?: number
       offset?: number
     }
-    Body: any
+    Body: IQueryExpression
   }>(
     '/fts/:namespace/query'
   , {
@@ -54,14 +54,14 @@ async function routes(server, { Core }) {
       if (accept === 'application/x-ndjson') {
         const stream = Readable.from(stringifyNDJSONStreamAsync(results))
         stream.once('error', err => reply.status(400).send(err))
-        reply
+        return reply
           .status(200)
           .header('Content-Type', 'application/x-ndjson')
           .send(stream)
       } else {
         const stream = Readable.from(stringifyJSONStreamAsync(results))
         stream.once('error', err => reply.status(400).send(err))
-        reply
+        return reply
           .status(200)
           .header('Content-Type', 'application/json')
           .send(stream)

@@ -1,8 +1,6 @@
-import * as DAO from '@dao/data-in-postgresql/fts/delete-all-objects-by-bucket'
-import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils'
-import { hasRawObject, setRawObject } from './utils'
-
-jest.mock('@dao/config-in-sqlite3/database')
+import * as DAO from '@dao/data-in-postgresql/fts/delete-all-objects-by-bucket.js'
+import { initializeDatabases, clearDatabases, closeAllConnections } from '@test/utils.js'
+import { hasRawObject, setRawObject } from './utils.js'
 
 beforeEach(initializeDatabases)
 afterEach(clearDatabases)

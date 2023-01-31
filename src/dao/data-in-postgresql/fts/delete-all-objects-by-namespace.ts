@@ -1,4 +1,4 @@
-import { db } from '../database'
+import { db } from '../database.js'
 
 export async function deleteAllObjectsByNamespace(namespace: string): Promise<void> {
   await db.none(`

@@ -16,7 +16,6 @@ export default {
 , externals: {
     'pg-native': 'commonjs pg-native'
   , 'long': 'commonjs long'
-  , 'app-root-path': 'commonjs app-root-path'
   , 'better-sqlite3': 'commonjs better-sqlite3'
   }
 }

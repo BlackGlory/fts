@@ -6,7 +6,7 @@ import {
 , DB_NAME
 , NODE_ENV
 , NodeEnv
-} from '@env'
+} from '@env/index.js'
 import bluebird from 'bluebird'
 import pgPromise from 'pg-promise'
 

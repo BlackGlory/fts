@@ -1,10 +1,10 @@
 import { ValueGetter } from 'value-getter'
-import { isNumber } from '@blackglory/types'
-import { Getter } from 'justypes'
+import { isNumber } from '@blackglory/prelude'
+import { Getter } from '@blackglory/prelude'
 import { assert } from '@blackglory/errors'
-import { getCache } from './cache'
-import { path as appRoot } from 'app-root-path'
+import { getCache } from './cache.js'
 import * as path from 'path'
+import { getAppRoot } from '@utils/get-app-root.js'
 
 export enum ListBasedAccessControl {
   Disable
@@ -39,7 +39,7 @@ export const CI: Getter<boolean> =
 
 export const DATA: Getter<string> =
   env('FTS_SQLITE_DATA')
-    .default(path.join(appRoot, 'data'))
+    .default(path.join(getAppRoot(), 'data'))
     .memoize(getCache)
     .get()
 
@@ -85,13 +85,6 @@ export const PORT: Getter<number> =
   env('FTS_PORT')
     .convert(toInteger)
     .default(8080)
-    .memoize(getCache)
-    .get()
-
-export const HTTP2: Getter<boolean> =
-  env('FTS_HTTP2')
-    .convert(toBool)
-    .default(false)
     .memoize(getCache)
     .get()
 

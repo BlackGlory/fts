@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, bucketSchema, tokenSchema, idSchema } from '@src/schema'
+import { namespaceSchema, bucketSchema, tokenSchema, idSchema } from '@src/schema.js'
 
 export const routes: FastifyPluginAsync<{ Core: ICore }> =
 async function routes(server, { Core }) {
@@ -41,7 +41,9 @@ async function routes(server, { Core }) {
       }
 
       await Core.FTS.del(namespace, bucket, id)
-      reply.status(204).send()
+      return reply
+        .status(204)
+        .send()
     }
   )
 }

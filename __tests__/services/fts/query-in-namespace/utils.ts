@@ -1,4 +1,4 @@
-import { FTSDAO } from '@dao'
+import { FTSDAO } from '@dao/index.js'
 
 export async function prepareFTSs(namespaces: string[]): Promise<void> {
   for (const namespace of namespaces) {

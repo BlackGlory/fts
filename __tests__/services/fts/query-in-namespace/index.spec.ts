@@ -1,12 +1,10 @@
 import { expectMatchSchema, startService, stopService, getAddress, closeAllConnections }
-  from '@test/utils'
-import { prepareFTSs } from './utils'
+  from '@test/utils.js'
+import { prepareFTSs } from './utils.js'
 import { fetch } from 'extra-fetch'
 import { post } from 'extra-request'
-import { url, pathname, json } from 'extra-request/lib/es2018/transformers'
+import { url, pathname, json } from 'extra-request/transformers'
 import { toJSON } from 'extra-response'
-
-jest.mock('@dao/config-in-sqlite3/database')
 
 beforeEach(startService)
 afterEach(stopService)
