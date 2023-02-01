@@ -1,12 +1,11 @@
-import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database.js'
-import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils.js'
+import * as ConfigInSQLite3 from '@dao/config/database.js'
+import * as DataInPostgreSQL from '@dao/data/utils.js'
 import { resetCache } from '@env/cache.js'
 import { buildServer } from '@src/server.js'
-import { db } from '@dao/data-in-postgresql/database.js'
+import { db } from '@dao/data/database.js'
 import Ajv from 'ajv'
 
-// @ts-ignore
-const ajv = new Ajv()
+const ajv = new Ajv.default()
 let server: ReturnType<typeof buildServer>
 let address: string
 

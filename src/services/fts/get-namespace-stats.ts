@@ -1,8 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
 import { namespaceSchema } from '@src/schema.js'
+import { IAPI } from '@api/contract.js'
 
-export const routes: FastifyPluginAsync<{ Core: ICore }> =
-async function routes(server, { Core }) {
+export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
   server.get<{
     Params: { namespace: string }
   }>(
@@ -24,7 +24,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
 
-      const result = await Core.FTS.getNamespaceStats(namespace)
+      const result = await api.FTS.getNamespaceStats(namespace)
       return reply.send(result)
     }
   )

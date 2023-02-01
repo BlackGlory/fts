@@ -9,17 +9,17 @@ import { routes as queryInBucketsRoutes } from './query-in-buckets.js'
 import { routes as setRoutes } from './set.js'
 import { routes as getNamespaceStatsoutes } from './get-namespace-stats.js'
 import { routes as getBucketStatsRoutes } from './get-bucket-stats.js'
+import { IAPI } from '@api/contract.js'
 
-export const routes: FastifyPluginAsync<{ Core: ICore }> =
-async function routes(server, { Core }) {
-  server.register(clearNamespaceRoutes, { Core })
-  server.register(clearBucketRoutes, { Core })
-  server.register(deleteRoutes, { Core })
-  server.register(getAllNamespacesRoutes, { Core })
-  server.register(getAllBucketRoutes, { Core })
-  server.register(queryInNamespaceRoutes, { Core })
-  server.register(queryInBucketsRoutes, { Core })
-  server.register(setRoutes, { Core })
-  server.register(getNamespaceStatsoutes, { Core })
-  server.register(getBucketStatsRoutes, { Core })
+export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
+  server.register(clearNamespaceRoutes, { api })
+  server.register(clearBucketRoutes, { api })
+  server.register(deleteRoutes, { api })
+  server.register(getAllNamespacesRoutes, { api })
+  server.register(getAllBucketRoutes, { api })
+  server.register(queryInNamespaceRoutes, { api })
+  server.register(queryInBucketsRoutes, { api })
+  server.register(setRoutes, { api })
+  server.register(getNamespaceStatsoutes, { api })
+  server.register(getBucketStatsRoutes, { api })
 }

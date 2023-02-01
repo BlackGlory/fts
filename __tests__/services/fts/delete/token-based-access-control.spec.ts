@@ -18,8 +18,8 @@ describe('token-based access control', () => {
           const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
-          await AccessControlDAO.setDeleteTokenRequired(namespace, true)
-          await AccessControlDAO.setDeleteToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setDeleteTokenRequired(namespace, true)
+          AccessControlDAO.Token.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
@@ -38,8 +38,8 @@ describe('token-based access control', () => {
           const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
-          await AccessControlDAO.setDeleteTokenRequired(namespace, true)
-          await AccessControlDAO.setDeleteToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setDeleteTokenRequired(namespace, true)
+          AccessControlDAO.Token.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
@@ -58,8 +58,8 @@ describe('token-based access control', () => {
           const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
-          await AccessControlDAO.setDeleteTokenRequired(namespace, true)
-          await AccessControlDAO.setDeleteToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setDeleteTokenRequired(namespace, true)
+          AccessControlDAO.Token.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
@@ -115,8 +115,8 @@ describe('token-based access control', () => {
           const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
-          await AccessControlDAO.setDeleteTokenRequired(namespace, true)
-          await AccessControlDAO.setDeleteToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setDeleteTokenRequired(namespace, true)
+          AccessControlDAO.Token.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())
@@ -136,8 +136,8 @@ describe('token-based access control', () => {
           const bucket = 'bucket'
           const token = 'token'
           const id = 'id'
-          await AccessControlDAO.setDeleteTokenRequired(namespace, true)
-          await AccessControlDAO.setDeleteToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setDeleteTokenRequired(namespace, true)
+          AccessControlDAO.Token.setDeleteToken({ namespace, token })
 
           const res = await fetch(del(
             url(getAddress())

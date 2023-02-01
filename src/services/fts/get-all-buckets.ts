@@ -3,9 +3,9 @@ import { stringifyJSONStreamAsync, stringifyNDJSONStreamAsync } from 'extra-gene
 import { Readable } from 'stream'
 import { namespaceSchema } from '@src/schema.js'
 import accepts from '@fastify/accepts'
+import { IAPI } from '@api/contract.js'
 
-export const routes: FastifyPluginAsync<{ Core: ICore }> =
-async function routes(server, { Core }) {
+export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
   server.register(accepts)
 
   server.get<{
@@ -22,7 +22,7 @@ async function routes(server, { Core }) {
     }
   , (req, reply) => {
       const { namespace } = req.params
-      const result = Core.FTS.getAllBuckets(namespace)
+      const result = api.FTS.getAllBuckets(namespace)
 
       const accept = req.accepts().type(['application/json', 'application/x-ndjson'])
       if (accept === 'application/x-ndjson') {

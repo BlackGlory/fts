@@ -16,7 +16,7 @@ describe('whitelist', () => {
         const namespace = 'namespace'
         const bucket = 'bucket'
         const id = 'id'
-        await AccessControlDAO.addWhitelistItem(namespace)
+        AccessControlDAO.Whitelist.addWhitelistItem(namespace)
 
         const res = await fetch(put(
           url(getAddress())

@@ -15,7 +15,7 @@ describe('whitelist', () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'whitelist'
         const namespace = 'namespace'
         const buckets = ['bucket-1', 'bucket-2'].join(',')
-        await AccessControlDAO.addWhitelistItem(namespace)
+        AccessControlDAO.Whitelist.addWhitelistItem(namespace)
 
         const res = await fetch(post(
           url(getAddress())

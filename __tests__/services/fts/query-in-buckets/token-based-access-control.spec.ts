@@ -17,8 +17,8 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const buckets = ['bucket-1', 'bucket-2'].join(',')
           const token = 'token'
-          await AccessControlDAO.setQueryTokenRequired(namespace, true)
-          await AccessControlDAO.setQueryToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setQueryTokenRequired(namespace, true)
+          AccessControlDAO.Token.setQueryToken({ namespace, token })
 
           const res = await fetch(post(
             url(getAddress())
@@ -37,8 +37,8 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const buckets = ['bucket-1', 'bucket-2'].join(',')
           const token = 'token'
-          await AccessControlDAO.setQueryTokenRequired(namespace, true)
-          await AccessControlDAO.setQueryToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setQueryTokenRequired(namespace, true)
+          AccessControlDAO.Token.setQueryToken({ namespace, token })
 
           const res = await fetch(post(
             url(getAddress())
@@ -57,8 +57,8 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const buckets = ['bucket-1', 'bucket-2'].join(',')
           const token = 'token'
-          await AccessControlDAO.setQueryTokenRequired(namespace, true)
-          await AccessControlDAO.setQueryToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setQueryTokenRequired(namespace, true)
+          AccessControlDAO.Token.setQueryToken({ namespace, token })
 
           const res = await fetch(post(
             url(getAddress())
@@ -115,8 +115,8 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const buckets = ['bucket-1', 'bucket-2'].join(',')
           const token = 'token'
-          await AccessControlDAO.setQueryTokenRequired(namespace, true)
-          await AccessControlDAO.setQueryToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setQueryTokenRequired(namespace, true)
+          AccessControlDAO.Token.setQueryToken({ namespace, token })
 
           const res = await fetch(post(
             url(getAddress())
@@ -137,8 +137,8 @@ describe('token-based access control', () => {
           const namespace = 'namespace'
           const buckets = ['bucket-1', 'bucket-2'].join(',')
           const token = 'token'
-          await AccessControlDAO.setQueryTokenRequired(namespace, true)
-          await AccessControlDAO.setQueryToken({ namespace, token })
+          AccessControlDAO.TokenPolicy.setQueryTokenRequired(namespace, true)
+          AccessControlDAO.Token.setQueryToken({ namespace, token })
 
           const res = await fetch(post(
             url(getAddress())

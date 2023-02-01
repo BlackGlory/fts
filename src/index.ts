@@ -1,17 +1,17 @@
 import { go } from '@blackglory/prelude'
-import * as ConfigInSQLite3 from '@dao/config-in-sqlite3/database.js'
-import * as DataInPostgreSQL from '@dao/data-in-postgresql/utils.js'
+import * as Config from '@dao/config/database.js'
+import * as Data from '@dao/data/utils.js'
 import { buildServer } from './server.js'
 import { PORT, HOST, NODE_ENV, NodeEnv } from '@env/index.js'
 import { youDied } from 'you-died'
 
 go(async () => {
-  ConfigInSQLite3.openDatabase()
-  youDied(() => ConfigInSQLite3.closeDatabase())
-  ConfigInSQLite3.prepareDatabase()
+  Config.openDatabase()
+  youDied(() => Config.closeDatabase())
+  Config.prepareDatabase()
 
-  await DataInPostgreSQL.ensureDatabase()
-  await DataInPostgreSQL.migrateDatabase()
+  await Data.ensureDatabase()
+  await Data.migrateDatabase()
 
   const server = buildServer()
   await server.listen({

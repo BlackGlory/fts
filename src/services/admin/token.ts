@@ -1,8 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
 import { namespaceSchema, tokenSchema } from '@src/schema.js'
+import { IAPI } from '@api/contract.js'
 
-export const routes: FastifyPluginAsync<{ Core: ICore }> =
-async function routes(server, { Core }) {
+export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
   // get all namespaces
   server.get<{ Params: { namespace: string }}>(
     '/fts-with-tokens'
@@ -18,7 +18,7 @@ async function routes(server, { Core }) {
       }
     }
   , async (req, reply) => {
-      const result = await Core.TBAC.Token.getAllNamespaces()
+      const result = api.TBAC.Token.getAllNamespaces()
       return reply.send(result)
     }
   )
@@ -49,7 +49,7 @@ async function routes(server, { Core }) {
     }
   , async (req, reply) => {
       const namespace = req.params.namespace
-      const result = await Core.TBAC.Token.getAll(namespace)
+      const result = api.TBAC.Token.getAll(namespace)
       return reply.send(result)
     }
   )
@@ -73,7 +73,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.setWriteToken(namespace, token)
+      api.TBAC.Token.setWriteToken(namespace, token)
       return reply
         .status(204)
         .send()
@@ -98,7 +98,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.unsetWriteToken(namespace, token)
+      api.TBAC.Token.unsetWriteToken(namespace, token)
       return reply
         .status(204)
         .send()
@@ -124,7 +124,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.setQueryToken(namespace, token)
+      api.TBAC.Token.setQueryToken(namespace, token)
       return reply
         .status(204)
         .send()
@@ -149,7 +149,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.unsetQueryToken(namespace, token)
+      api.TBAC.Token.unsetQueryToken(namespace, token)
       return reply
         .status(204)
         .send()
@@ -175,7 +175,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.setDeleteToken(namespace, token)
+      api.TBAC.Token.setDeleteToken(namespace, token)
       return reply
         .status(204)
         .send()
@@ -200,7 +200,7 @@ async function routes(server, { Core }) {
   , async (req, reply) => {
       const namespace = req.params.namespace
       const token = req.params.token
-      await Core.TBAC.Token.unsetDeleteToken(namespace, token)
+      api.TBAC.Token.unsetDeleteToken(namespace, token)
       return reply
         .status(204)
         .send()

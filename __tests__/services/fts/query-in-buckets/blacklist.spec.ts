@@ -15,7 +15,7 @@ describe('blacklist', () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
         const buckets = ['bucket-1', 'bucket-2'].join(',')
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(post(
           url(getAddress())
@@ -49,7 +49,7 @@ describe('blacklist', () => {
       it('200', async () => {
         const namespace = 'namespace'
         const buckets = ['bucket-1', 'bucket-2'].join(',')
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(post(
           url(getAddress())

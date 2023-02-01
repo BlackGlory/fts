@@ -4,6 +4,7 @@ import { fetch } from 'extra-fetch'
 import { post } from 'extra-request'
 import { url, pathname, json } from 'extra-request/transformers'
 import { toJSON } from 'extra-response'
+import { IQueryResult } from '@api/contract.js'
 
 beforeEach(startService)
 afterEach(stopService)

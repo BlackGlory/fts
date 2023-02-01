@@ -16,7 +16,7 @@ describe('blacklist', () => {
         const namespace = 'namespace'
         const bucket = 'bucket'
         const id = 'id'
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(put(
           url(getAddress())
@@ -52,7 +52,7 @@ describe('blacklist', () => {
         const namespace = 'namespace'
         const bucket = 'bucket'
         const id = 'id'
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(put(
           url(getAddress())

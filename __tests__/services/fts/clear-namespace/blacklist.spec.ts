@@ -14,7 +14,7 @@ describe('blacklist', () => {
       it('403', async () => {
         process.env.FTS_LIST_BASED_ACCESS_CONTROL = 'blacklist'
         const namespace = 'namespace'
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(del(
           url(getAddress())
@@ -44,7 +44,7 @@ describe('blacklist', () => {
     describe('namespace in blacklist', () => {
       it('204', async () => {
         const namespace = 'namespace'
-        await AccessControlDAO.addBlacklistItem(namespace)
+        AccessControlDAO.Blacklist.addBlacklistItem(namespace)
 
         const res = await fetch(del(
           url(getAddress())
