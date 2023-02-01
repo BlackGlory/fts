@@ -12,14 +12,14 @@ import { routes as getBucketStatsRoutes } from './get-bucket-stats.js'
 import { IAPI } from '@api/contract.js'
 
 export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
-  server.register(clearNamespaceRoutes, { api })
-  server.register(clearBucketRoutes, { api })
-  server.register(deleteRoutes, { api })
-  server.register(getAllNamespacesRoutes, { api })
-  server.register(getAllBucketRoutes, { api })
-  server.register(queryInNamespaceRoutes, { api })
-  server.register(queryInBucketsRoutes, { api })
-  server.register(setRoutes, { api })
-  server.register(getNamespaceStatsoutes, { api })
-  server.register(getBucketStatsRoutes, { api })
+  await server.register(clearNamespaceRoutes, { api })
+  await server.register(clearBucketRoutes, { api })
+  await server.register(deleteRoutes, { api })
+  await server.register(getAllNamespacesRoutes, { api })
+  await server.register(getAllBucketRoutes, { api })
+  await server.register(queryInNamespaceRoutes, { api })
+  await server.register(queryInBucketsRoutes, { api })
+  await server.register(setRoutes, { api })
+  await server.register(getNamespaceStatsoutes, { api })
+  await server.register(getBucketStatsRoutes, { api })
 }

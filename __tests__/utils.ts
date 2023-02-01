@@ -4,9 +4,10 @@ import { resetCache } from '@env/cache.js'
 import { buildServer } from '@src/server.js'
 import { db } from '@dao/data/database.js'
 import Ajv from 'ajv'
+import { UnpackedPromise } from 'hotypes'
 
 const ajv = new Ajv.default()
-let server: ReturnType<typeof buildServer>
+let server: UnpackedPromise<ReturnType<typeof buildServer>>
 let address: string
 
 export function getAddress() {
@@ -18,7 +19,7 @@ export async function startService() {
   await DataInPostgreSQL.migrateDatabase()
   await initializeDatabases()
 
-  server = buildServer()
+  server = await buildServer()
   address = await server.listen()
 }
 

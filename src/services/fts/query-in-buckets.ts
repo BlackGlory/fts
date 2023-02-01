@@ -6,7 +6,7 @@ import accepts from '@fastify/accepts'
 import { IAPI, IQueryExpression } from '@api/contract.js'
 
 export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api }) => {
-  server.register(accepts)
+  await server.register(accepts)
 
   server.post<{
     Params: {
@@ -58,14 +58,24 @@ export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api })
       ])
       if (accept === 'application/x-ndjson') {
         const stream = Readable.from(stringifyNDJSONStreamAsync(results))
-        stream.once('error', err => reply.status(400).send(err))
+        stream.once('error', err => {
+          // eslint-disable-next-line
+          reply
+            .status(400)
+            .send(err)
+        })
         return reply
           .status(200)
           .header('Content-Type', 'application/x-ndjson')
           .send(stream)
       } else {
         const stream = Readable.from(stringifyJSONStreamAsync(results))
-        stream.once('error', err => reply.status(400).send(err))
+        stream.once('error', err => {
+          // eslint-disable-next-line
+          reply
+            .status(400)
+            .send(err)
+        })
         return reply
           .status(200)
           .header('Content-Type', 'application/json')

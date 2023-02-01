@@ -5,19 +5,21 @@ export const getAllWhitelistItems = withLazyStatic(function (): string[] {
   const result = lazyStatic(() => getDatabase().prepare(`
     SELECT namespace
       FROM fts_whitelist;
-  `), [getDatabase()]).all()
+  `), [getDatabase()])
+    .all() as Array<{ namespace: string }>
 
   return result.map(x => x['namespace'])
 })
 
-export const inWhitelist = withLazyStatic(function (namespace: string): boolean {
+export const inWhitelist = withLazyStatic((namespace: string): boolean => {
   const result = lazyStatic(() => getDatabase().prepare(`
     SELECT EXISTS(
              SELECT 1
                FROM fts_whitelist
               WHERE namespace = $namespace
            ) AS exist_in_whitelist;
-  `), [getDatabase()]).get({ namespace })
+  `), [getDatabase()])
+    .get({ namespace }) as { exist_in_whitelist: 1 | 0 }
 
   return result['exist_in_whitelist'] === 1
 })

@@ -1,30 +1,34 @@
 import { getDatabase } from '../database.js'
 import { withLazyStatic, lazyStatic } from 'extra-lazy'
 
-export const getAllNamespacesWithTokenPolicies = withLazyStatic(function (): string[] {
+export const getAllNamespacesWithTokenPolicies = withLazyStatic((): string[] => {
   const result = lazyStatic(() => getDatabase().prepare(`
     SELECT namespace
       FROM fts_token_policy;
-  `), [getDatabase()]).all()
+  `), [getDatabase()])
+    .all() as Array<{ namespace: string }>
+
   return result.map(x => x['namespace'])
 })
 
-export const getTokenPolicies = withLazyStatic(function (namespace: string): {
+export const getTokenPolicies = withLazyStatic((namespace: string): {
   writeTokenRequired: boolean | null
   queryTokenRequired: boolean | null
   deleteTokenRequired: boolean | null
-} {
-  const row: {
-    'write_token_required': number | null
-  , 'query_token_required': number | null
-  , 'delete_token_required': number | null
-  } = lazyStatic(() => getDatabase().prepare(`
+} => {
+  const row = lazyStatic(() => getDatabase().prepare(`
     SELECT write_token_required
          , query_token_required
          , delete_token_required
       FROM fts_token_policy
      WHERE namespace = $namespace;
-  `), [getDatabase()]).get({ namespace })
+  `), [getDatabase()])
+    .get({ namespace }) as {
+      write_token_required: number | null
+    , query_token_required: number | null
+    , delete_token_required: number | null
+    } | undefined
+
   if (row) {
     const writeTokenRequired = row['write_token_required']
     const queryTokenRequired = row['query_token_required']
