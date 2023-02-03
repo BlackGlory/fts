@@ -109,46 +109,6 @@ export const ADMIN_PASSWORD: Getter<string | undefined> =
     .memoize(getCache)
     .get()
 
-export const LIST_BASED_ACCESS_CONTROL: Getter<ListBasedAccessControl> =
-  env('FTS_LIST_BASED_ACCESS_CONTROL')
-    .convert(val => {
-      switch (val) {
-        case 'whitelist': return ListBasedAccessControl.Whitelist
-        case 'blacklist': return ListBasedAccessControl.Blacklist
-        default: return ListBasedAccessControl.Disable
-      }
-    })
-    .memoize(getCache)
-    .get()
-
-export const TOKEN_BASED_ACCESS_CONTROL: Getter<boolean> =
-  env('FTS_TOKEN_BASED_ACCESS_CONTROL')
-    .convert(toBool)
-    .default(false)
-    .memoize(getCache)
-    .get()
-
-export const WRITE_TOKEN_REQUIRED: Getter<boolean> =
-  env('FTS_WRITE_TOKEN_REQUIRED')
-    .convert(toBool)
-    .default(false)
-    .memoize(getCache)
-    .get()
-
-export const QUERY_TOKEN_REQUIRED: Getter<boolean> =
-  env('FTS_QUERY_TOKEN_REQUIRED')
-    .convert(toBool)
-    .default(false)
-    .memoize(getCache)
-    .get()
-
-export const DELETE_TOKEN_REQUIRED: Getter<boolean> =
-  env('FTS_DELETE_TOKEN_REQUIRED')
-    .convert(toBool)
-    .default(false)
-    .memoize(getCache)
-    .get()
-
 function env(name: string): ValueGetter<string | undefined> {
   return new ValueGetter(name, () => process.env[name])
 }

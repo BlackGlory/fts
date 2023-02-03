@@ -1,8 +1,7 @@
-import * as ConfigInSQLite3 from '@dao/config/database.js'
-import * as DataInPostgreSQL from '@dao/data/utils.js'
+import * as Data from '@dao/utils.js'
 import { resetCache } from '@env/cache.js'
 import { buildServer } from '@src/server.js'
-import { db } from '@dao/data/database.js'
+import { db } from '@dao/database.js'
 import Ajv from 'ajv'
 import { UnpackedPromise } from 'hotypes'
 
@@ -15,8 +14,8 @@ export function getAddress() {
 }
 
 export async function startService() {
-  await DataInPostgreSQL.ensureDatabase()
-  await DataInPostgreSQL.migrateDatabase()
+  await Data.ensureDatabase()
+  await Data.migrateDatabase()
   await initializeDatabases()
 
   server = await buildServer()
@@ -31,18 +30,13 @@ export async function stopService() {
 }
 
 export async function initializeDatabases() {
-  ConfigInSQLite3.openDatabase()
-  await ConfigInSQLite3.prepareDatabase()
-
-  await DataInPostgreSQL.ensureDatabase()
-  await DataInPostgreSQL.migrateDatabase()
+  await Data.ensureDatabase()
+  await Data.migrateDatabase()
 }
 
 export async function clearDatabases() {
-  ConfigInSQLite3.closeDatabase()
-
-  await DataInPostgreSQL.ensureDatabase()
-  await DataInPostgreSQL.migrateDatabase(0)
+  await Data.ensureDatabase()
+  await Data.migrateDatabase(0)
 }
 
 export async function closeAllConnections() {
@@ -58,14 +52,6 @@ export function resetEnvironment() {
   // use `delete` to delete a property from `process.env`.
   // see also: https://nodejs.org/api/process.html#process_process_env
   delete process.env.FTS_ADMIN_PASSWORD
-  delete process.env.FTS_LIST_BASED_ACCESS_CONTROL
-  delete process.env.FTS_TOKEN_BASED_ACCESS_CONTROL
-  delete process.env.FTS_WRITE_TOKEN_REQUIRED
-  delete process.env.FTS_QUERY_TOKEN_REQUIRED
-  delete process.env.FTS_DELETE_TOKEN_REQUIRED
-  delete process.env.FTS_JSON_VALIDATION
-  delete process.env.FTS_DEFAULT_JSON_SCHEMA
-  delete process.env.FTS_JSON_PAYLOAD_ONLY
 
   // reset memoize
   resetCache()

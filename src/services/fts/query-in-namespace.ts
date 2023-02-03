@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { namespaceSchema, tokenSchema } from '@src/schema.js'
+import { namespaceSchema } from '@src/schema.js'
 import { Readable } from 'stream'
 import { stringifyJSONStreamAsync, stringifyNDJSONStreamAsync } from 'extra-generator'
 import accepts from '@fastify/accepts'
@@ -11,7 +11,6 @@ export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api })
   server.post<{
     Params: { namespace: string }
     Querystring: {
-      token?: string
       limit?: number
       offset?: number
     }
@@ -26,25 +25,13 @@ export const routes: FastifyPluginAsync<{ api: IAPI }> = async (server, { api })
       , querystring: {
           limit: { type: 'integer', minimum: 1 }
         , offset: { type: 'integer', minimum: 0 }
-        , token: tokenSchema
         }
       }
     }
   , async (req, reply) => {
       const namespace = req.params.namespace
-      const { token, limit, offset } = req.query
+      const { limit, offset } = req.query
       const expression = req.body
-
-      try {
-        api.Blacklist.check(namespace)
-        api.Whitelist.check(namespace)
-        api.TBAC.checkQueryPermission(namespace, token)
-      } catch (e) {
-        if (e instanceof api.Blacklist.Forbidden) return reply.status(403).send()
-        if (e instanceof api.Whitelist.Forbidden) return reply.status(403).send()
-        if (e instanceof api.TBAC.Unauthorized) return reply.status(401).send()
-        throw e
-      }
 
       const results = api.FTS.query(namespace, expression, { limit, offset })
       const accept = req.accepts().type([

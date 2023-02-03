@@ -1,5 +1,3 @@
-import { CustomErrorConstructor } from '@blackglory/errors'
-
 export enum QueryKeyword {
   And = 0
 , Or = 1
@@ -87,92 +85,5 @@ export interface IAPI {
 
     getAllNamespaces(): AsyncIterable<string>
     getAllBuckets(namespace: string): AsyncIterable<string>
-  }
-
-  Blacklist: {
-    isEnabled(): boolean
-    isBlocked(namespace: string): boolean
-    getAll(): string[]
-    add(namespace: string): void
-    remove(namespace: string): void
-
-    /**
-     * @throws {Forbidden}
-     */
-    check(namespace: string): void
-
-    Forbidden: CustomErrorConstructor
-  }
-
-  Whitelist: {
-    isEnabled(): boolean
-    isBlocked(namespace: string): boolean
-    getAll(): string[]
-    add(namespace: string): void
-    remove(namespace: string): void
-
-    /**
-     * @throws {Forbidden}
-     */
-    check(namespace: string): void
-
-    Forbidden: CustomErrorConstructor
-  }
-
-  TBAC: {
-    isEnabled(): boolean
-
-    /**
-     * @throws {Unauthorized}
-     */
-    checkWritePermission(namespace: string, token?: string): void
-
-    /**
-     * @throws {Unauthorized}
-     */
-    checkQueryPermission(namespace: string, token?: string): void
-
-    /**
-     * @throws {Unauthorized}
-     */
-    checkDeletePermission(namespace: string, token?: string): void
-
-    Unauthorized: CustomErrorConstructor
-
-    Token: {
-      getAllNamespaces(): string[]
-      getAll(namespace: string): Array<{
-        token: string
-        write: boolean
-        query: boolean
-        delete: boolean
-      }>
-
-      setWriteToken(namespace: string, token: string): void
-      unsetWriteToken(namespace: string, token: string): void
-
-      setQueryToken(namespace: string, token: string): void
-      unsetQueryToken(namespace: string, token: string): void
-
-      setDeleteToken(namespace: string, token: string): void
-      unsetDeleteToken(namespace: string, token: string): void
-    }
-
-    TokenPolicy: {
-      getAllNamespaces(): string[]
-      get(namespace: string): {
-        writeTokenRequired: boolean | null
-        queryTokenRequired: boolean | null
-      }
-
-      setWriteTokenRequired(namespace: string, val: boolean): void
-      unsetWriteTokenRequired(namespace: string): void
-
-      setQueryTokenRequired(namespace: string, val: boolean): void
-      unsetQueryTokenRequired(namespace: string): void
-
-      setDeleteTokenRequired(namespace: string, val: boolean): void
-      unsetDeleteTokenRequired(namespace: string): void
-    }
   }
 }

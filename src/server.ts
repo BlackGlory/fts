@@ -1,7 +1,6 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
 import { routes as fts } from '@services/fts/index.js'
-import { routes as admin } from '@services/admin/index.js'
 import { routes as robots } from '@services/robots/index.js'
 import { routes as health } from '@services/health/index.js'
 import { PAYLOAD_LIMIT, NODE_ENV, NodeEnv } from '@env/index.js'
@@ -43,7 +42,6 @@ export async function buildServer() {
 
   await server.register(cors, { origin: true })
   await server.register(fts, { api })
-  await server.register(admin, { api })
   await server.register(robots)
   await server.register(health)
 
