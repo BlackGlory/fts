@@ -46,7 +46,7 @@ yarn bundle
 yarn --silent start
 ```
 
-#### 从源代码构建
+### 从源代码构建
 ```sh
 git clone https://github.com/BlackGlory/fts
 cd fts
