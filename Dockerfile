@@ -3,8 +3,7 @@ WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 
 RUN yarn install \
- && yarn cache clean \
- && apk del .build-deps
+ && yarn cache clean
 
 COPY . ./
 
