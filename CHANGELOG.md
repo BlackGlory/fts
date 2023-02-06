@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/BlackGlory/fts/compare/v0.4.1...v0.5.0) (2023-02-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* - HTTP => WebSocket.
+- The APIs have been redesigned.
+- Renamed `FTS_POSTGRES_NAME to `FTS_POSTGRES_DATABASE`.
+- Upgrade to PostgreSQL 15.
+* - Removed JSON schema validation.
+- Removed access control.
+
+* redesign APIs ([093b0cc](https://github.com/BlackGlory/fts/commit/093b0cc63831835ef223451d8cb1dbc43f67667c))
+* remove JSON schema validation, access control ([08bd6ca](https://github.com/BlackGlory/fts/commit/08bd6caef85e7c326bed9bbed0ab0b70ccfd6cb2))
+
 ### [0.4.1](https://github.com/BlackGlory/fts/compare/v0.4.0...v0.4.1) (2023-02-01)
 
 ## [0.4.0](https://github.com/BlackGlory/fts/compare/v0.3.4...v0.4.0) (2023-01-31)
