@@ -1,18 +1,16 @@
 import { go } from '@blackglory/prelude'
-import * as Data from '@dao/utils.js'
-import { buildServer } from './server.js'
+import { ensureDatabase, migrateDatabase } from '@src/database.js'
+import { startServer } from './server.js'
 import { PORT, HOST, NODE_ENV, NodeEnv } from '@env/index.js'
+import { youDied } from 'you-died'
 
 // eslint-disable-next-line
 go(async () => {
-  await Data.ensureDatabase()
-  await Data.migrateDatabase()
+  await ensureDatabase()
+  await migrateDatabase()
 
-  const server = await buildServer()
-  await server.listen({
-    host: HOST()
-  , port: PORT()
-  })
+  const closeServer = startServer(HOST(), PORT())
+  youDied(closeServer)
   if (NODE_ENV() === NodeEnv.Test) process.exit()
 
   process.send?.('ready')

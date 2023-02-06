@@ -15,7 +15,7 @@ export default {
   }
 , externals: {
     'pg-native': 'commonjs pg-native'
-  , 'long': 'commonjs long'
-  , 'better-sqlite3': 'commonjs better-sqlite3'
+  , 'bufferutil': 'commonjs bufferutil'
+  , 'utf-8-validate': 'commonjs utf-8-validate'
   }
 }

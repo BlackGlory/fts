@@ -1,10 +1,6 @@
 import { ValueGetter } from 'value-getter'
-import { isNumber } from '@blackglory/prelude'
-import { Getter } from '@blackglory/prelude'
-import { assert } from '@blackglory/errors'
+import { assert, Getter, isNumber } from '@blackglory/prelude'
 import { getCache } from './cache.js'
-import * as path from 'path'
-import { getAppRoot } from '@utils/get-app-root.js'
 
 export enum ListBasedAccessControl {
   Disable
@@ -37,19 +33,13 @@ export const CI: Getter<boolean> =
     .memoize(getCache)
     .get()
 
-export const DATA: Getter<string> =
-  env('FTS_SQLITE_DATA')
-    .default(path.join(getAppRoot(), 'data'))
-    .memoize(getCache)
-    .get()
-
-export const DB_HOST: Getter<string> =
+export const POSTGRES_HOST: Getter<string> =
   env('FTS_POSTGRES_HOST')
     .required()
     .memoize(getCache)
     .get()
 
-export const DB_PORT: Getter<number> =
+export const POSTGRES_PORT: Getter<number> =
   env('FTS_POSTGRES_PORT')
     .convert(toInteger)
     .default(5432)
@@ -57,20 +47,20 @@ export const DB_PORT: Getter<number> =
     .memoize(getCache)
     .get()
 
-export const DB_USERNAME: Getter<string> =
+export const POSTGRES_USERNAME: Getter<string> =
   env('FTS_POSTGRES_USERNAME')
     .required()
     .memoize(getCache)
     .get()
 
-export const DB_PASSWORD: Getter<string> =
+export const POSTGRES_PASSWORD: Getter<string> =
   env('FTS_POSTGRES_PASSWORD')
     .required()
     .memoize(getCache)
     .get()
 
-export const DB_NAME: Getter<string> =
-  env('FTS_POSTGRES_NAME')
+export const POSTGRES_DATABASE: Getter<string> =
+  env('FTS_POSTGRES_DATABASE')
     .required()
     .memoize(getCache)
     .get()
@@ -88,24 +78,11 @@ export const PORT: Getter<number> =
     .memoize(getCache)
     .get()
 
-export const PAYLOAD_LIMIT: Getter<number> =
-  env('FTS_PAYLOAD_LIMIT')
+export const WS_HEARTBEAT_INTERVAL: Getter<number> =
+  env('FTS_WS_HEARTBEAT_INTERVAL')
     .convert(toInteger)
-    .default(1048576)
-    .assert(shouldBePositive)
-    .memoize(getCache)
-    .get()
-
-export const WRITE_PAYLOAD_LIMIT: Getter<number> =
-  env('FTS_WRITE_PAYLOAD_LIMIT')
-    .convert(toInteger)
-    .default(PAYLOAD_LIMIT())
-    .assert(shouldBePositive)
-    .memoize(getCache)
-    .get()
-
-export const ADMIN_PASSWORD: Getter<string | undefined> =
-  env('FTS_ADMIN_PASSWORD')
+    .default(0)
+    .assert(shouldBePositiveOrZero)
     .memoize(getCache)
     .get()
 
@@ -123,6 +100,6 @@ function toInteger(val: string | number | undefined ): number | undefined {
   if (val) return Number.parseInt(val, 10)
 }
 
-function shouldBePositive(val: number) {
-  assert(val > 0, 'should be positive')
+function shouldBePositiveOrZero(val: number) {
+  assert(val === 0 || val > 0, 'should be positive or zero')
 }
