@@ -19,5 +19,5 @@ export const API: ImplementationOf<IAPI> = {
 , removeDocument
 , clearBucketsByNamespace
 , clearDocumentsByBucket
-, queryDocuments
+, queryDocuments: queryDocuments as ImplementationOf<IAPI>['queryDocuments']
 }

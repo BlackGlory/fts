@@ -10,7 +10,7 @@ export async function queryDocuments(
     buckets?: string[]
     limit?: number
     offset?: number
-  }
+  } = {}
 ): Promise<IDocumentQueryResult[]> {
   const { buckets, limit, offset } = options
   const collector = new ParameterCollector<string>('param')
