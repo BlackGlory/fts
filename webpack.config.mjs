@@ -15,6 +15,7 @@ export default {
   }
 , externals: {
     'pg-native': 'commonjs pg-native'
+  , 'pg-cloudflare': 'commonjs pg-cloudflare'
   , 'bufferutil': 'commonjs bufferutil'
   , 'utf-8-validate': 'commonjs utf-8-validate'
   }

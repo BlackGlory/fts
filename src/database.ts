@@ -14,7 +14,7 @@ import { map } from 'extra-promise'
 import * as path from 'path'
 import { migrate } from '@blackglory/pg-migrations'
 import { getAppRoot } from '@utils/get-app-root.js'
-import { Client } from '@utils/pg.js'
+import { Client } from 'pg'
 
 // 即使在支持追踪异步错误的Node.js v12里, pg模块也无法跟踪异步错误的堆栈.
 // 这个问题可能在pg被重构后解决, 目前只能通过将Promise替换为Bluebird来实现堆栈跟踪.
@@ -66,7 +66,9 @@ export async function ensureDatabase(): Promise<void> {
         FROM pg_database
        WHERE datname = $1
     `, [POSTGRES_DATABASE()])
-    if (result.rowCount == 0) await client.query(`CREATE DATABASE "${POSTGRES_DATABASE()}"`)
+    if (result.rowCount == 0) {
+      await client.query(`CREATE DATABASE "${POSTGRES_DATABASE()}"`)
+    }
   } finally {
     await client.end()
   }
