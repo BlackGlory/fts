@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import { convertExpressionToTsquery } from '@dao/utils/convert-expression-to-tsquery.js'
 import { ParameterCollector } from 'extra-sql-builder'
 import { QueryKeyword } from '@src/contract.js'

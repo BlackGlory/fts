@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach, afterEach, afterAll } from 'vitest'
 import { startService, stopService, buildClient, closeAllConnections } from '@test/utils.js'
 import { hasRawDocument, setRawDocument } from './utils.js'
 
