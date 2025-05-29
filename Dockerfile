@@ -16,6 +16,7 @@ COPY --from=builder /usr/src/app/dist /usr/src/app/dist
 COPY package.json yarn.lock ./
 
 RUN yarn install --production \
+ && yarn global add @blackglory/undead@0.1.2 \
  && yarn cache clean \
  && mkdir /data \
  && ln -s /data data
@@ -25,5 +26,5 @@ COPY . ./
 ENV FTS_HOST=0.0.0.0
 ENV FTS_PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["yarn"]
-CMD ["--silent", "start"]
+ENTRYPOINT ["undead"]
+CMD ["yarn --silent", "start"]
