@@ -1,5 +1,5 @@
 import { ValueGetter } from 'value-getter'
-import { assert, Getter, isNumber } from '@blackglory/prelude'
+import { assert, Getter } from '@blackglory/prelude'
 import { getCache } from './cache.js'
 
 export enum ListBasedAccessControl {
@@ -90,16 +90,14 @@ function env(name: string): ValueGetter<string | undefined> {
   return new ValueGetter(name, () => process.env[name])
 }
 
-function toBool(val: string | boolean | undefined): boolean | undefined {
+function toBool(val: string | undefined): boolean | undefined {
   if (val) return val === 'true'
-  return false
 }
 
-function toInteger(val: string | number | undefined ): number | undefined {
-  if (isNumber(val)) return val
+function toInteger(val: string | undefined): number | undefined {
   if (val) return Number.parseInt(val, 10)
 }
 
-function shouldBePositiveOrZero(val: number) {
+function shouldBePositiveOrZero(val: number): void {
   assert(val === 0 || val > 0, 'should be positive or zero')
 }
