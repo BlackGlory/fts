@@ -7,7 +7,7 @@ CREATE TABLE fts_document (
 );
 
 CREATE INDEX idx_fts_document_vector
-    ON fts_object
+    ON fts_document
  USING GIN (vector)
   WITH (fastupdate = ON);
 
