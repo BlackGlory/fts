@@ -67,7 +67,7 @@ export async function ensureDatabase(): Promise<void> {
        WHERE datname = $1
     `, [POSTGRES_DATABASE()])
     if (result.rowCount == 0) {
-      await client.query(`CREATE DATABASE "${POSTGRES_DATABASE()}"`)
+      await client.query(`CREATE DATABASE ${client.escapeIdentifier(POSTGRES_DATABASE())}`)
     }
   } finally {
     await client.end()
