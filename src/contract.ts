@@ -17,6 +17,8 @@ export type IQueryExpression =
 export type ITermExpression = string
 export type IPhraseExpression = [
   QueryKeyword.Phrase
+, IQueryExpression
+, IQueryExpression
 , ...IQueryExpression[]
 ]
 export type IPrefixExpression = [

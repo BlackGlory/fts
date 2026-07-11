@@ -163,6 +163,8 @@ type ITermExpression = string
 
 type IPhraseExpression = [
   QueryKeyword.Phrase
+, IQueryExpression
+, IQueryExpression
 , ...IQueryExpression[]
 ]
 
